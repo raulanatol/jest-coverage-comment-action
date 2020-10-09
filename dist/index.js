@@ -29,12 +29,18 @@ const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percen
     <p>${summary}</p>
    </details>`;
 const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const octokit = github_1.getOctokit(core_1.getInput('github-token'));
+    const issueNumber = (_a = github_1.context.payload.issue) === null || _a === void 0 ? void 0 : _a.number;
+    if (!issueNumber) {
+        core_1.warning('Issue number not found. Impossible to create a comment');
+        return;
+    }
     yield octokit.issues.createComment({
         repo: github_1.context.repo.repo,
         owner: github_1.context.repo.owner,
         body: comment,
-        issue_number: github_1.context.payload.number
+        issue_number: issueNumber
     });
 });
 const generateCoverageSummary = () => __awaiter(void 0, void 0, void 0, function* () {
