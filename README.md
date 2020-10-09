@@ -1,8 +1,8 @@
 <div align="center">
-    <h1>template-action-nodejs-ts</h1>
+    <h1>jest-coverage-comment-action</h1>
 </div>
 
-<p>📓 A simple nodejs action template (using typescript)</p>
+<p>Comments a PR with the coverage (jest)</p>
 
 ---
 

@@ -1,13 +1,13 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
+name: 'Jest Coverage Comment Action'
+description: 'Comments a PR with the coverage (jest)'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  github-token:
+    description: 'Github token'
     required: true
-    default: 'World'
-outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  jest-command:
+    description: 'The jest command'
+    required: false
+    default: 'npx jest --coverage'
 runs:
   using: 'node12'
   main: 'index.js'
