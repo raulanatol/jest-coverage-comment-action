@@ -16,13 +16,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const core_1 = __importDefault(__webpack_require__(186));
 const exec_1 = __webpack_require__(514);
 const github_1 = __webpack_require__(438);
+const core_1 = __webpack_require__(186);
 const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
     const percent = yield exec_1.exec('npx coverage-percentage ./coverage/lcov.info --lcov').toString();
     return Number(percent);
@@ -32,7 +29,7 @@ const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percen
     <p>${summary}</p>
    </details>`;
 const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
-    const octokit = github_1.getOctokit(core_1.default.getInput('github-token'));
+    const octokit = github_1.getOctokit(core_1.getInput('github-token'));
     yield octokit.issues.createComment({
         repo: github_1.context.repo.repo,
         owner: github_1.context.repo.owner,
@@ -41,7 +38,7 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
     });
 });
 const generateCoverageSummary = () => __awaiter(void 0, void 0, void 0, function* () {
-    const jestCommand = core_1.default.getInput('jest-command');
+    const jestCommand = core_1.getInput('jest-command');
     return exec_1.exec(jestCommand).toString();
 });
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,13 +48,14 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     yield createComment(comment);
 });
 start().catch(error => {
-    core_1.default.setFailed(error.message);
+    console.log('EEE', error);
+    core_1.setFailed(error.message);
 });
 
 
 /***/ }),
 
-/***/ 351:
+/***/ 241:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -178,7 +176,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const command_1 = __webpack_require__(351);
+const command_1 = __webpack_require__(241);
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 /**
@@ -462,7 +460,7 @@ const os = __importStar(__webpack_require__(87));
 const events = __importStar(__webpack_require__(614));
 const child = __importStar(__webpack_require__(129));
 const path = __importStar(__webpack_require__(622));
-const io = __importStar(__webpack_require__(436));
+const io = __importStar(__webpack_require__(351));
 const ioUtil = __importStar(__webpack_require__(962));
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
@@ -2061,7 +2059,7 @@ function isUnixExecutable(stats) {
 
 /***/ }),
 
-/***/ 436:
+/***/ 351:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
