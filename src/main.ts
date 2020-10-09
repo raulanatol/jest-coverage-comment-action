@@ -1,6 +1,6 @@
-import core from '@actions/core';
 import { exec } from '@actions/exec';
 import { context, getOctokit } from '@actions/github';
+import { getInput, setFailed } from '@actions/core';
 
 const getCoveragePercent = async (): Promise<number> => {
   const percent = await exec('npx coverage-percentage ./coverage/lcov.info --lcov').toString();
@@ -14,7 +14,7 @@ const generateComment = (percent: number, summary: string): string =>
    </details>`;
 
 const createComment = async (comment: string) => {
-  const octokit = getOctokit(core.getInput('github-token'));
+  const octokit = getOctokit(getInput('github-token'));
   await octokit.issues.createComment({
     repo: context.repo.repo,
     owner: context.repo.owner,
@@ -24,7 +24,7 @@ const createComment = async (comment: string) => {
 };
 
 const generateCoverageSummary = async (): Promise<string> => {
-  const jestCommand = core.getInput('jest-command');
+  const jestCommand = getInput('jest-command');
   return exec(jestCommand).toString();
 };
 
@@ -36,5 +36,6 @@ const start = async () => {
 };
 
 start().catch(error => {
-  core.setFailed(error.message);
+  console.log('EEE', error);
+  setFailed(error.message);
 });
