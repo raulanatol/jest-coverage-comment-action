@@ -1,0 +1,37 @@
+{
+  "name": "template-action-nodejs-ts",
+  "version": "1.0.0",
+  "description": "📓 A simple docker container action template (using typescript)",
+  "keywords": [],
+  "homepage": "https://github.com/raulanatol/template-action-nodejs-ts#readme",
+  "bugs": {
+    "url": "https://github.com/raulanatol/template-action-nodejs-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raulanatol/template-action-nodejs-ts.git"
+  },
+  "license": "MIT",
+  "author": "raulanatol",
+  "main": "lib/main.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint --max-warnings 0 . --ext .ts",
+    "clean": "shx rm -rf dist lib",
+    "package": "ncc build --source-map --license licenses.txt"
+  },
+  "dependencies": {
+    "@actions/core": "^1.2.5",
+    "@actions/github": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cowcoders/eslint-config": "^1.0.3",
+    "@types/jest": "^26.0.13",
+    "@typescript-eslint/parser": "^4.1.0",
+    "@vercel/ncc": "^0.24.0",
+    "eslint": "^7.9.0",
+    "jest": "^26.4.2",
+    "shx": "^0.3.2",
+    "typescript": "^4.0.2"
+  }
+}
