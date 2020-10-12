@@ -1,5 +1,9 @@
 name: 'Jest Coverage Comment Action'
 description: 'Comments a PR with the coverage (jest)'
+author: raulanatol
+branding:
+  color: green
+  icon: message-circle
 inputs:
   github-token:
     description: 'Github token'
