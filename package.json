@@ -1,6 +1,6 @@
 {
   "name": "jest-coverage-comment-action",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "⚡ Comments a PR with the coverage (jest))",
   "keywords": [],
   "homepage": "https://github.com/raulanatol/jest-coverage-comment-action#readme",
