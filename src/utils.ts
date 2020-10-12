@@ -5,6 +5,7 @@ import { getInput, warning } from '@actions/core';
 export const execCommand = async (command: string): Promise<string> => {
   const output: string[] = [];
   const options = {
+    silent: true,
     listeners: {
       stdline: (data: string) => {
         output.push(data);
@@ -20,7 +21,7 @@ export const getCoveragePercent = async (): Promise<number> => {
   return Number(parseFloat(percent).toFixed(2));
 };
 
-const generateComment = (percent: number, summary: string): string =>
+export const generateComment = (percent: number, summary: string): string =>
   `<p>Total Coverage: <code>${percent}</code></p>
    <details><summary>Coverage report</summary>
     <p>${summary}</p>
@@ -47,13 +48,12 @@ const createComment = async (comment: string) => {
   });
 };
 
-const generateCoverageSummary = async (): Promise<string> => {
-  const jestCommand = getInput('jest-command');
-  return await execCommand(jestCommand);
-};
+export const generateCoverageSummary = async (jestCommand: string): Promise<string> =>
+  await execCommand(jestCommand);
 
 export const start = async () => {
-  const coverageSummary = await generateCoverageSummary();
+  const jestCommand = getInput('jest-command');
+  const coverageSummary = await generateCoverageSummary(jestCommand);
   const percent = await getCoveragePercent();
   const comment = generateComment(percent, coverageSummary);
   await createComment(comment);

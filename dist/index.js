@@ -35,13 +35,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.start = exports.getCoveragePercent = exports.execCommand = void 0;
+exports.start = exports.generateCoverageSummary = exports.generateComment = exports.getCoveragePercent = exports.execCommand = void 0;
 const exec_1 = __webpack_require__(514);
 const github_1 = __webpack_require__(438);
 const core_1 = __webpack_require__(186);
 exports.execCommand = (command) => __awaiter(void 0, void 0, void 0, function* () {
     const output = [];
     const options = {
+        silent: true,
         listeners: {
             stdline: (data) => {
                 output.push(data);
@@ -55,7 +56,7 @@ exports.getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* (
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
     return Number(parseFloat(percent).toFixed(2));
 });
-const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
+exports.generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
    <details><summary>Coverage report</summary>
     <p>${summary}</p>
    </details>`;
@@ -78,14 +79,12 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
         issue_number: issueNumber
     });
 });
-const generateCoverageSummary = () => __awaiter(void 0, void 0, void 0, function* () {
-    const jestCommand = core_1.getInput('jest-command');
-    return yield exports.execCommand(jestCommand);
-});
+exports.generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand); });
 exports.start = () => __awaiter(void 0, void 0, void 0, function* () {
-    const coverageSummary = yield generateCoverageSummary();
+    const jestCommand = core_1.getInput('jest-command');
+    const coverageSummary = yield exports.generateCoverageSummary(jestCommand);
     const percent = yield exports.getCoveragePercent();
-    const comment = generateComment(percent, coverageSummary);
+    const comment = exports.generateComment(percent, coverageSummary);
     yield createComment(comment);
 });
 
