@@ -1,9 +1,6 @@
 import { info, setFailed } from '@actions/core';
-import { start } from './utils';
+import { start } from './action';
 
 start()
   .then(() => info('Finished!'))
-  .catch(error => {
-    console.log('EEE', error);
-    setFailed(error.message);
-  });
+  .catch(error => setFailed(error.message));

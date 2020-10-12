@@ -1,43 +1,83 @@
-// // import { getCoveragePercent } from '../utils';
-// import { execCommand, generateComment } from '../utils';
-//
+import { generateComment, getIssueNumber, stringFormatter, summaryFormatter } from '../utils';
+
+const validJestReportResponse: string[] = [
+  '----------|---------|----------|---------|---------|-------------------',
+  'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
+  '----------|---------|----------|---------|---------|-------------------',
+  'All files |       0 |        0 |       0 |       0 |                  ·',
+  '----------|---------|----------|---------|---------|-------------------"'
+];
+
 describe('utils', () => {
-  test('should return true', () => {
-    expect(3 > 2).toBeTruthy();
+  describe('getIssueNumber', () => {
+    test('should return undefined if the payload is undefined', () => {
+      expect(getIssueNumber(undefined)).toBeUndefined();
+    });
+
+    test('should return undefined if is not a valid payload', () => {
+      const invalidPayload = { invalid: true };
+      expect(getIssueNumber(invalidPayload)).toBeUndefined();
+    });
+
+    test('should return the pull_request number if the payload is a valid pull_request payload', () => {
+      const pullRequestPayload = { pull_request: { number: 12 } };
+      expect(getIssueNumber(pullRequestPayload)).toBe(12);
+    });
+
+    test('should return the issue number if the payload is a valid issue payload', () => {
+      const issuePayload = { issue: { number: 12 } };
+      expect(getIssueNumber(issuePayload)).toBe(12);
+    });
+  });
+
+  describe('stringFormatter', () => {
+    test('should return a valid string when a simple input is provided', () => {
+      expect(stringFormatter(['foo', 'bar'])).toBe('foo\nbar');
+    });
+
+    test('should return an empty string if a empty input is provided', () => {
+      expect(stringFormatter([])).toBe('');
+    });
+  });
+
+  describe('summaryFormatter', () => {
+    test('should return an empty string if a empty input is provided', () => {
+      expect(summaryFormatter([])).toBe('');
+    });
+
+    test('should return a string with no first and last line', () => {
+      expect(summaryFormatter(['first', 'middle', 'last'])).toBe('middle');
+    });
+
+    test('should return a valid format when a real coverage input was provided', () => {
+      const expected = [
+        'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
+        '----------|---------|----------|---------|---------|-------------------',
+        'All files |       0 |        0 |       0 |       0 |                  ·'
+      ].join('\n');
+
+      expect(summaryFormatter(validJestReportResponse)).toBe(expected);
+    });
+  });
+
+  describe('generateComment', () => {
+    test('should return a valid comment', () => {
+      const realSummary = summaryFormatter(validJestReportResponse);
+
+      const result = generateComment(30, realSummary);
+
+      const expected = [
+        '<p>Total Coverage: <code>30</code></p>',
+        '<details><summary>Coverage report</summary>',
+        '',
+        'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
+        '----------|---------|----------|---------|---------|-------------------',
+        'All files |       0 |        0 |       0 |       0 |                  ·',
+        '',
+        '</details>'
+      ].join('\n');
+
+      expect(result).toStrictEqual(expected);
+    });
   });
 });
-//
-// // test('should return a coverage', async () => {
-// //   const result = await getCoveragePercent();
-// //   expect(a).toBe(2);
-// // });
-// // xtest('should return a coverage', async () => {
-// //   const result = await generateCoverageSummary('yarn test --coverage main.test.ts');
-// //   expect(result).toBe(2);
-// // });
-//
-// xtest('should execute the command', async () => {
-//   const result = await execCommand('yarn test --coverage main.test.ts');
-//   // console.log('💣 [[[[]]]]', result);
-//   expect(result).toBe(2);
-// });
-//
-// test('should generateComment', () => {
-//   const summary: string[] = [
-//     '----------|---------|----------|---------|---------|-------------------',
-//     'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
-//     '----------|---------|----------|---------|---------|-------------------',
-//     'All files |       0 |        0 |       0 |       0 |                  ·',
-//     '----------|---------|----------|---------|---------|-------------------"'
-//   ];
-//   const result = generateComment(10, summary.join('\n'));
-//   expect(result).toBe('23');
-// });
-//
-// // import { execCommand } from '../utils';
-// //
-// // test('should ', async () => {
-// //   const coverageSummary = await execCommand('yarn test --coverage main.test.ts');
-// //   console.log('result', coverageSummary);
-// //   return coverageSummary.toString();
-// // });

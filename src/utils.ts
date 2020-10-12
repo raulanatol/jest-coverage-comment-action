@@ -2,7 +2,15 @@ import { exec } from '@actions/exec';
 import { context, getOctokit } from '@actions/github';
 import { getInput, warning } from '@actions/core';
 
-export const execCommand = async (command: string): Promise<string> => {
+// eslint-disable-next-line no-unused-vars
+type CommandResultFormatter = (input: string[]) => string;
+
+export const stringFormatter: CommandResultFormatter = (input: string[]) => input.join('\n');
+
+export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
+  stringFormatter(input.slice(1, input.length - 1));
+
+export const execCommand = async (command: string, formatter = stringFormatter): Promise<string> => {
   const output: string[] = [];
   const options = {
     silent: true,
@@ -13,7 +21,7 @@ export const execCommand = async (command: string): Promise<string> => {
     }
   };
   await exec(command, [], options);
-  return Promise.resolve(output.join('\n'));
+  return Promise.resolve(formatter(output));
 };
 
 export const getCoveragePercent = async (): Promise<number> => {
@@ -23,15 +31,17 @@ export const getCoveragePercent = async (): Promise<number> => {
 
 export const generateComment = (percent: number, summary: string): string =>
   `<p>Total Coverage: <code>${percent}</code></p>
-   <details><summary>Coverage report</summary>
-    <p>${summary}</p>
-   </details>`;
+<details><summary>Coverage report</summary>
 
-const getIssueNumber = (payload): number | undefined =>
-  payload.pull_request?.number ||
-  payload.issue?.number;
+${summary}
 
-const createComment = async (comment: string) => {
+</details>`;
+
+export const getIssueNumber = (payload): number | undefined =>
+  payload?.pull_request?.number ||
+  payload?.issue?.number;
+
+export const createComment = async (comment: string) => {
   const octokit = getOctokit(getInput('github-token'));
   const issueNumber = getIssueNumber(context.payload);
   if (!issueNumber) {
@@ -49,12 +59,4 @@ const createComment = async (comment: string) => {
 };
 
 export const generateCoverageSummary = async (jestCommand: string): Promise<string> =>
-  await execCommand(jestCommand);
-
-export const start = async () => {
-  const jestCommand = getInput('jest-command');
-  const coverageSummary = await generateCoverageSummary(jestCommand);
-  const percent = await getCoveragePercent();
-  const comment = generateComment(percent, coverageSummary);
-  await createComment(comment);
-};
+  await execCommand(jestCommand, summaryFormatter);

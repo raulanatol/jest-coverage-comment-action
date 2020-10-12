@@ -2,6 +2,35 @@ require('./sourcemap-register.js');module.exports =
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 139:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.start = void 0;
+const core_1 = __webpack_require__(186);
+const utils_1 = __webpack_require__(918);
+exports.start = () => __awaiter(void 0, void 0, void 0, function* () {
+    const jestCommand = core_1.getInput('jest-command');
+    const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
+    const percent = yield utils_1.getCoveragePercent();
+    const comment = utils_1.generateComment(percent, coverageSummary);
+    yield utils_1.createComment(comment);
+});
+
+
+/***/ }),
+
 /***/ 109:
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -9,13 +38,10 @@ require('./sourcemap-register.js');module.exports =
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __webpack_require__(186);
-const utils_1 = __webpack_require__(918);
-utils_1.start()
+const action_1 = __webpack_require__(139);
+action_1.start()
     .then(() => core_1.info('Finished!'))
-    .catch(error => {
-    console.log('EEE', error);
-    core_1.setFailed(error.message);
-});
+    .catch(error => core_1.setFailed(error.message));
 
 
 /***/ }),
@@ -35,11 +61,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.start = exports.generateCoverageSummary = exports.generateComment = exports.getCoveragePercent = exports.execCommand = void 0;
+exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
 const exec_1 = __webpack_require__(514);
 const github_1 = __webpack_require__(438);
 const core_1 = __webpack_require__(186);
-exports.execCommand = (command) => __awaiter(void 0, void 0, void 0, function* () {
+exports.stringFormatter = (input) => input.join('\n');
+exports.summaryFormatter = (input) => exports.stringFormatter(input.slice(1, input.length - 1));
+exports.execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
     const output = [];
     const options = {
         silent: true,
@@ -50,23 +78,25 @@ exports.execCommand = (command) => __awaiter(void 0, void 0, void 0, function* (
         }
     };
     yield exec_1.exec(command, [], options);
-    return Promise.resolve(output.join('\n'));
+    return Promise.resolve(formatter(output));
 });
 exports.getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
     return Number(parseFloat(percent).toFixed(2));
 });
 exports.generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
-   <details><summary>Coverage report</summary>
-    <p>${summary}</p>
-   </details>`;
-const getIssueNumber = (payload) => {
+<details><summary>Coverage report</summary>
+
+${summary}
+
+</details>`;
+exports.getIssueNumber = (payload) => {
     var _a, _b;
-    return ((_a = payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) || ((_b = payload.issue) === null || _b === void 0 ? void 0 : _b.number);
+    return ((_a = payload === null || payload === void 0 ? void 0 : payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) || ((_b = payload === null || payload === void 0 ? void 0 : payload.issue) === null || _b === void 0 ? void 0 : _b.number);
 };
-const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
+exports.createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
     const octokit = github_1.getOctokit(core_1.getInput('github-token'));
-    const issueNumber = getIssueNumber(github_1.context.payload);
+    const issueNumber = exports.getIssueNumber(github_1.context.payload);
     if (!issueNumber) {
         console.log('CONTEXT', github_1.context);
         core_1.warning('Issue number not found. Impossible to create a comment');
@@ -79,14 +109,7 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
         issue_number: issueNumber
     });
 });
-exports.generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand); });
-exports.start = () => __awaiter(void 0, void 0, void 0, function* () {
-    const jestCommand = core_1.getInput('jest-command');
-    const coverageSummary = yield exports.generateCoverageSummary(jestCommand);
-    const percent = yield exports.getCoveragePercent();
-    const comment = exports.generateComment(percent, coverageSummary);
-    yield createComment(comment);
-});
+exports.generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand, exports.summaryFormatter); });
 
 
 /***/ }),
