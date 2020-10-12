@@ -18,6 +18,7 @@ const createComment = async (comment: string) => {
   const issueNumber = context.payload.issue?.number;
   if (!issueNumber) {
     console.log('PAYLOAD', context.payload);
+    console.log('CONTEXT', context);
     warning('Issue number not found. Impossible to create a comment');
     return;
   }
