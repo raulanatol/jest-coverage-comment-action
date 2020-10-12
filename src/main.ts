@@ -1,10 +1,10 @@
 import { exec } from '@actions/exec';
 import { context, getOctokit } from '@actions/github';
-import { getInput, setFailed, warning } from '@actions/core';
+import { getInput, info, setFailed, warning } from '@actions/core';
 
 const getCoveragePercent = async (): Promise<number> => {
-  const percent = await exec('npx coverage-percentage ./coverage/lcov.info --lcov').toString();
-  return Number(percent);
+  const percent = await exec('npx coverage-percentage ./coverage/lcov.info --lcov');
+  return Number(percent.toString());
 };
 
 const generateComment = (percent: number, summary: string): string =>
@@ -36,7 +36,8 @@ const createComment = async (comment: string) => {
 
 const generateCoverageSummary = async (): Promise<string> => {
   const jestCommand = getInput('jest-command');
-  return exec(jestCommand).toString();
+  const coverageSummary = await exec(jestCommand);
+  return coverageSummary.toString();
 };
 
 const start = async () => {
@@ -46,7 +47,9 @@ const start = async () => {
   await createComment(comment);
 };
 
-start().catch(error => {
-  console.log('EEE', error);
-  setFailed(error.message);
-});
+start()
+  .then(() => info('Finished!'))
+  .catch(error => {
+    console.log('EEE', error);
+    setFailed(error.message);
+  });

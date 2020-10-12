@@ -21,8 +21,8 @@ const exec_1 = __webpack_require__(514);
 const github_1 = __webpack_require__(438);
 const core_1 = __webpack_require__(186);
 const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
-    const percent = yield exec_1.exec('npx coverage-percentage ./coverage/lcov.info --lcov').toString();
-    return Number(percent);
+    const percent = yield exec_1.exec('npx coverage-percentage ./coverage/lcov.info --lcov');
+    return Number(percent.toString());
 });
 const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
    <details><summary>Coverage report</summary>
@@ -49,7 +49,8 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
 });
 const generateCoverageSummary = () => __awaiter(void 0, void 0, void 0, function* () {
     const jestCommand = core_1.getInput('jest-command');
-    return exec_1.exec(jestCommand).toString();
+    const coverageSummary = yield exec_1.exec(jestCommand);
+    return coverageSummary.toString();
 });
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const coverageSummary = yield generateCoverageSummary();
@@ -57,7 +58,9 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const comment = generateComment(percent, coverageSummary);
     yield createComment(comment);
 });
-start().catch(error => {
+start()
+    .then(() => core_1.info('Finished!'))
+    .catch(error => {
     console.log('EEE', error);
     core_1.setFailed(error.message);
 });
