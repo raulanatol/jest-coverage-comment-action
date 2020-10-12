@@ -40,16 +40,16 @@ const exec_1 = __webpack_require__(514);
 const github_1 = __webpack_require__(438);
 const core_1 = __webpack_require__(186);
 exports.execCommand = (command) => __awaiter(void 0, void 0, void 0, function* () {
-    let output = '';
+    const output = [];
     const options = {
         listeners: {
             stdline: (data) => {
-                output += data;
+                output.push(data);
             }
         }
     };
     yield exec_1.exec(command, [], options);
-    return Promise.resolve(output);
+    return Promise.resolve(output.join('\n'));
 });
 exports.getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
