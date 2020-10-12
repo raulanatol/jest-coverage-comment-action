@@ -34,6 +34,7 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
     const issueNumber = (_a = github_1.context.payload.issue) === null || _a === void 0 ? void 0 : _a.number;
     if (!issueNumber) {
         console.log('PAYLOAD', github_1.context.payload);
+        console.log('CONTEXT', github_1.context);
         core_1.warning('Issue number not found. Impossible to create a comment');
         return;
     }
