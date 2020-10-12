@@ -26,13 +26,19 @@
     "@actions/github": "^4.0.0"
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.10.4",
     "@cowcoders/eslint-config": "^1.0.3",
-    "@types/jest": "^26.0.13",
+    "@types/jest": "^26.0.14",
     "@typescript-eslint/parser": "^4.1.0",
     "@vercel/ncc": "^0.24.0",
     "eslint": "^7.9.0",
     "jest": "^26.4.2",
     "shx": "^0.3.2",
+    "ts-jest": "^26.4.1",
     "typescript": "^4.0.2"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   }
 }

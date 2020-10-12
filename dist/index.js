@@ -3,6 +3,24 @@ require('./sourcemap-register.js');module.exports =
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 109:
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core_1 = __webpack_require__(186);
+const utils_1 = __webpack_require__(918);
+utils_1.start()
+    .then(() => core_1.info('Finished!'))
+    .catch(error => {
+    console.log('EEE', error);
+    core_1.setFailed(error.message);
+});
+
+
+/***/ }),
+
+/***/ 918:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -17,12 +35,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.start = exports.getCoveragePercent = exports.execCommand = void 0;
 const exec_1 = __webpack_require__(514);
 const github_1 = __webpack_require__(438);
 const core_1 = __webpack_require__(186);
-const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
-    const percent = yield exec_1.exec('npx coverage-percentage ./coverage/lcov.info --lcov');
-    return Number(percent.toString());
+exports.execCommand = (command) => __awaiter(void 0, void 0, void 0, function* () {
+    let output = '';
+    const options = {
+        listeners: {
+            stdline: (data) => {
+                output += data;
+            }
+        }
+    };
+    yield exec_1.exec(command, [], options);
+    return Promise.resolve(output);
+});
+exports.getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
+    const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
+    return Number(parseFloat(percent).toFixed(2));
 });
 const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
    <details><summary>Coverage report</summary>
@@ -49,26 +80,19 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
 });
 const generateCoverageSummary = () => __awaiter(void 0, void 0, void 0, function* () {
     const jestCommand = core_1.getInput('jest-command');
-    const coverageSummary = yield exec_1.exec(jestCommand);
-    return coverageSummary.toString();
+    return yield exports.execCommand(jestCommand);
 });
-const start = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.start = () => __awaiter(void 0, void 0, void 0, function* () {
     const coverageSummary = yield generateCoverageSummary();
-    const percent = yield getCoveragePercent();
+    const percent = yield exports.getCoveragePercent();
     const comment = generateComment(percent, coverageSummary);
     yield createComment(comment);
-});
-start()
-    .then(() => core_1.info('Finished!'))
-    .catch(error => {
-    console.log('EEE', error);
-    core_1.setFailed(error.message);
 });
 
 
 /***/ }),
 
-/***/ 241:
+/***/ 351:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
@@ -189,7 +213,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const command_1 = __webpack_require__(241);
+const command_1 = __webpack_require__(351);
 const os = __importStar(__webpack_require__(87));
 const path = __importStar(__webpack_require__(622));
 /**
@@ -473,7 +497,7 @@ const os = __importStar(__webpack_require__(87));
 const events = __importStar(__webpack_require__(614));
 const child = __importStar(__webpack_require__(129));
 const path = __importStar(__webpack_require__(622));
-const io = __importStar(__webpack_require__(351));
+const io = __importStar(__webpack_require__(436));
 const ioUtil = __importStar(__webpack_require__(962));
 /* eslint-disable @typescript-eslint/unbound-method */
 const IS_WINDOWS = process.platform === 'win32';
@@ -2072,7 +2096,7 @@ function isUnixExecutable(stats) {
 
 /***/ }),
 
-/***/ 351:
+/***/ 436:
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
