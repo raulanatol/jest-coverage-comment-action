@@ -3,16 +3,16 @@ import { context, getOctokit } from '@actions/github';
 import { getInput, warning } from '@actions/core';
 
 export const execCommand = async (command: string): Promise<string> => {
-  let output = '';
+  const output: string[] = [];
   const options = {
     listeners: {
       stdline: (data: string) => {
-        output += data;
+        output.push(data);
       }
     }
   };
   await exec(command, [], options);
-  return Promise.resolve(output);
+  return Promise.resolve(output.join('\n'));
 };
 
 export const getCoveragePercent = async (): Promise<number> => {
