@@ -28,13 +28,14 @@ const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percen
    <details><summary>Coverage report</summary>
     <p>${summary}</p>
    </details>`;
+const getIssueNumber = (payload) => {
+    var _a, _b;
+    return ((_a = payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) || ((_b = payload.issue) === null || _b === void 0 ? void 0 : _b.number);
+};
 const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const octokit = github_1.getOctokit(core_1.getInput('github-token'));
-    const issueNumber = (_a = github_1.context.payload.issue) === null || _a === void 0 ? void 0 : _a.number;
+    const issueNumber = getIssueNumber(github_1.context.payload);
     if (!issueNumber) {
-        console.log('PAYLOAD', github_1.context.payload);
-        console.log('CONTEXT', github_1.context);
         core_1.warning('Issue number not found. Impossible to create a comment');
         return;
     }

@@ -13,12 +13,14 @@ const generateComment = (percent: number, summary: string): string =>
     <p>${summary}</p>
    </details>`;
 
+const getIssueNumber = (payload): number | undefined =>
+  payload.pull_request?.number ||
+  payload.issue?.number;
+
 const createComment = async (comment: string) => {
   const octokit = getOctokit(getInput('github-token'));
-  const issueNumber = context.payload.issue?.number;
+  const issueNumber = getIssueNumber(context.payload);
   if (!issueNumber) {
-    console.log('PAYLOAD', context.payload);
-    console.log('CONTEXT', context);
     warning('Issue number not found. Impossible to create a comment');
     return;
   }
