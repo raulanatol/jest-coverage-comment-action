@@ -4,6 +4,8 @@
 
 <p>Comments a PR with the coverage (jest)</p>
 
+![message](./docs/message.png)
+
 ---
 
 ## Table of Contents
