@@ -36,6 +36,7 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
     const octokit = github_1.getOctokit(core_1.getInput('github-token'));
     const issueNumber = getIssueNumber(github_1.context.payload);
     if (!issueNumber) {
+        console.log('PAYLOAD', github_1.context.payload);
         core_1.warning('Issue number not found. Impossible to create a comment');
         return;
     }
