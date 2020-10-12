@@ -1,44 +1,44 @@
 {
-  "name": "template-action-nodejs-ts",
+  "name": "jest-coverage-comment-action",
   "version": "1.0.0",
-  "description": "📓 A simple docker container action template (using typescript)",
+  "description": "⚡ Comments a PR with the coverage (jest))",
   "keywords": [],
-  "homepage": "https://github.com/raulanatol/template-action-nodejs-ts#readme",
+  "homepage": "https://github.com/raulanatol/jest-coverage-comment-action#readme",
   "bugs": {
-    "url": "https://github.com/raulanatol/template-action-nodejs-ts/issues"
+    "url": "https://github.com/raulanatol/jest-coverage-comment-action/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/raulanatol/template-action-nodejs-ts.git"
+    "url": "git+https://github.com/raulanatol/jest-coverage-comment-action.git"
   },
   "license": "MIT",
   "author": "raulanatol",
   "main": "lib/main.js",
   "scripts": {
-    "test": "jest",
-    "lint": "eslint --max-warnings 0 . --ext .ts",
     "clean": "shx rm -rf dist lib",
-    "package": "ncc build --source-map --license licenses.txt"
+    "lint": "eslint --max-warnings 0 . --ext .ts",
+    "package": "ncc build --source-map --license licenses.txt",
+    "test": "jest"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   },
   "dependencies": {
-    "@actions/core": "^1.2.5",
+    "@actions/core": "^1.2.6",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.4",
-    "@cowcoders/eslint-config": "^1.0.3",
+    "@cowcoders/eslint-config": "^1.0.4",
     "@types/jest": "^26.0.14",
-    "@typescript-eslint/parser": "^4.1.0",
-    "@vercel/ncc": "^0.24.0",
-    "eslint": "^7.9.0",
-    "jest": "^26.4.2",
+    "@typescript-eslint/parser": "^4.4.0",
+    "@vercel/ncc": "^0.24.1",
+    "eslint": "^7.11.0",
+    "jest": "^26.5.3",
     "shx": "^0.3.2",
     "ts-jest": "^26.4.1",
-    "typescript": "^4.0.2"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node"
+    "typescript": "^4.0.3"
   }
 }

@@ -13,12 +13,10 @@
 
 
 - [Inputs](#inputs)
-  - [`who-to-greet`](#who-to-greet)
-- [Outputs](#outputs)
-  - [`time`](#time)
-- [Example usage](#example-usage)
-- [Example using a public action](#example-using-a-public-action)
-- [Example using a private action](#example-using-a-private-action)
+  - [`github-token`](#github-token)
+  - [`jest-command`](#jest-command)
+- [Example of usage](#example-of-usage)
+- [Example using a custom jest command](#example-using-a-custom-jest-command)
 - [Development](#development)
   - [Close release](#close-release)
   - [Documentation](#documentation)
@@ -27,70 +25,39 @@
 
 ## Inputs
 
-### `who-to-greet`
+### `github-token`
 
-**Required** The name of the person to greet. Default `"World"`.
+**Required** The github token to comment in the PR.
 
-## Outputs
+### `jest-command`
 
-### `time`
+**Required** The command used to generate the coverage. Default: `npx jest --coverage`
 
-The time we greeted you.
-
-## Example usage
+## Example of usage
 
 ```yaml
-uses: raulanatol/template-action-nodejs-ts@v1.0.0
+uses: raulanatol/jest-coverage-comment-action@v1.0.0
 with:
-  who-to-greet: 'Mona the Octocat'
+  github-token: ${{ secrets.GITHUB_TOKEN }}'
 ```
   
-## Example using a public action
+## Example using a custom jest command
 
 **.github/workflows/main.yml**
 
 ```yaml
-on: [push]
+on: pull_request
 
 jobs:
-  hello_world_job:
+  build:
     runs-on: ubuntu-latest
-    name: A job to say hello
     steps:
     - name: Hello world action step
       id: hello
-      uses: raulanatol/template-action-nodejs-ts@v1.0.0
+      uses: raulanatol/jest-coverage-comment-action@v1.0.0
       with:
-        who-to-greet: 'Mona the Octocat'
-    # Use the output from the `hello` step
-    - name: Get the output time
-      run: echo "The time was ${{ steps.hello.outputs.time }}"
-```
-
-## Example using a private action
-
-**.github/workflows/main.yml**
-
-```yaml
-on: [push]
-
-jobs:
-  hello_world_job:
-    runs-on: ubuntu-latest
-    name: A job to say hello
-    steps:
-      # To use this repository's private action,
-      # you must check out the repository
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Hello world action step
-        uses: ./ # Uses an action in the root directory
-        id: hello
-        with:
-          who-to-greet: 'Mona the Octocat'
-      # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        jest-command: 'npm run jest-ci'
 ```
 
 ## Development
