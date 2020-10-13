@@ -1,4 +1,17 @@
-import { generateComment, getIssueNumber, stringFormatter, summaryFormatter } from '../utils';
+import { generateComment, generateJestCommand, getIssueNumber, stringFormatter, summaryFormatter } from '../utils';
+
+jest.mock('@actions/core', () => ({
+  getInput: (param) => {
+    switch (param) {
+      case 'jest-command':
+        return 'npx jest --coverage';
+      case 'only-changes':
+        return 'true';
+    }
+  }
+}));
+
+const jestCommandWithChangeSinceOption = 'npx jest --coverage --changeSince=context.payload.pull_request.base_ref';
 
 const validJestReportResponse: string[] = [
   '----------|---------|----------|---------|---------|-------------------',
@@ -7,6 +20,7 @@ const validJestReportResponse: string[] = [
   'All files |       0 |        0 |       0 |       0 |                  ·',
   '----------|---------|----------|---------|---------|-------------------"'
 ];
+
 
 describe('utils', () => {
   describe('getIssueNumber', () => {
@@ -78,6 +92,13 @@ describe('utils', () => {
       ].join('\n');
 
       expect(result).toStrictEqual(expected);
+    });
+  });
+
+  describe('generateJestCommand', () => {
+    it('should return the jest command with the changeSince option', () => {
+      const result = generateJestCommand();
+      expect(result).toBe(jestCommandWithChangeSinceOption);
     });
   });
 });

@@ -60,3 +60,25 @@ export const createComment = async (comment: string) => {
 
 export const generateCoverageSummary = async (jestCommand: string): Promise<string> =>
   await execCommand(jestCommand, summaryFormatter);
+
+const generateChangeSinceParam = () => {
+  const param = getInput('only-changes');
+
+  switch (param) {
+    case 'true':
+      return '--changeSince=context.payload.pull_request.base_ref';
+    case 'false':
+      return '';
+    default:
+      console.warn('only-changes parameter: ', param);
+      warning('You need to pass either "true" or "false" as only-changes parameter');
+  }
+};
+
+export const generateJestCommand = () => {
+  const baseCommand = getInput('jest-command');
+  const changeSinceParam = generateChangeSinceParam();
+  const fullCommand = `${baseCommand} ${changeSinceParam}`;
+
+  return fullCommand;
+};

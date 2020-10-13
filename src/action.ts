@@ -3,6 +3,7 @@ import { createComment, generateComment, generateCoverageSummary, getCoveragePer
 
 export const start = async () => {
   const jestCommand = getInput('jest-command');
+  const jestCommand = generateJestCommand();
   const coverageSummary = await generateCoverageSummary(jestCommand);
   const percent = await getCoveragePercent();
   const comment = generateComment(percent, coverageSummary);
