@@ -75,17 +75,17 @@ const getBooleanInput = (input: string): boolean | undefined => {
 const generateChangeSinceParam = (baseCommand: string) => {
   const param = getBooleanInput('only-changes');
 
-  if (param === undefined) {
+  if (param === undefined || !context.payload.pull_request?.base_ref) {
     console.warn('only-changes parameter: ', param);
     warning('You need to pass either "true" or "false" as only-changes parameter');
-    return;
+    return '';
   }
 
   if (!param || baseCommand.includes('changeSince')) {
     return '';
   }
 
-  if (param) {
+  if (param && context.payload.pull_request?.base_ref) {
     return `--changeSince=${context.payload.pull_request?.base_ref}`;
   }
 };
