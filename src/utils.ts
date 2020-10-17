@@ -61,24 +61,37 @@ export const createComment = async (comment: string) => {
 export const generateCoverageSummary = async (jestCommand: string): Promise<string> =>
   await execCommand(jestCommand, summaryFormatter);
 
-const generateChangeSinceParam = () => {
-  const param = getInput('only-changes');
-
-  switch (param) {
+const getBooleanInput = (input: string): boolean | undefined => {
+  switch (getInput(input)) {
     case 'true':
-      return '--changeSince=context.payload.pull_request.base_ref';
+      return true;
     case 'false':
-      return '';
+      return false;
     default:
-      console.warn('only-changes parameter: ', param);
-      warning('You need to pass either "true" or "false" as only-changes parameter');
+      return undefined;
+  }
+};
+
+const generateChangeSinceParam = (baseCommand: string) => {
+  const param = getBooleanInput('only-changes');
+
+  if (param === undefined) {
+    console.warn('only-changes parameter: ', param);
+    warning('You need to pass either "true" or "false" as only-changes parameter');
+    return;
+  }
+
+  if (!param || baseCommand.includes('changeSince')) {
+    return '';
+  }
+
+  if (param) {
+    return `--changeSince=${context.payload.pull_request?.base_ref}`;
   }
 };
 
 export const generateJestCommand = () => {
   const baseCommand = getInput('jest-command');
-  const changeSinceParam = generateChangeSinceParam();
-  const fullCommand = `${baseCommand} ${changeSinceParam}`;
-
-  return fullCommand;
+  const changeSinceParam = generateChangeSinceParam(baseCommand);
+  return `${baseCommand} ${changeSinceParam}`;
 };
