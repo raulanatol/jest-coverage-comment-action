@@ -82,7 +82,7 @@ if (!param) {
     return '';
   }
 
-  if (param && context.payload.pull_request?.base_ref) {
+  if (context.payload.pull_request?.base_ref) {
     return `--changeSince=${context.payload.pull_request?.base_ref}`;
   }
 };
