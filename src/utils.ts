@@ -78,7 +78,7 @@ if (!param) {
    return '';
 }
 
-  if (!param || baseCommand.includes('changeSince')) {
+  if (baseCommand.includes('changeSince')) {
     return '';
   }
 
