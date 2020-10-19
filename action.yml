@@ -12,6 +12,10 @@ inputs:
     description: 'The jest command'
     required: false
     default: 'npx jest --coverage'
+  only-changes:
+    description: 'Add parameter to show the coverage only for the changed files'
+    required: false
+    default: 'true'
 runs:
   using: 'node12'
   main: 'dist/index.js'

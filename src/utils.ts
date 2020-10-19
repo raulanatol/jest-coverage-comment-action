@@ -60,3 +60,35 @@ export const createComment = async (comment: string) => {
 
 export const generateCoverageSummary = async (jestCommand: string): Promise<string> =>
   await execCommand(jestCommand, summaryFormatter);
+
+const getBooleanInput = (input: string): boolean | undefined => {
+  switch (getInput(input)) {
+    case 'true':
+      return true;
+    case 'false':
+      return false;
+    default:
+      return undefined;
+  }
+};
+
+const generateChangeSinceParam = (baseCommand: string) => {
+  const param = getBooleanInput('only-changes');
+if (!param) {
+   return '';
+}
+
+  if (baseCommand.includes('changeSince')) {
+    return '';
+  }
+
+  if (context.payload.pull_request?.base_ref) {
+    return `--changeSince=${context.payload.pull_request?.base_ref}`;
+  }
+};
+
+export const generateJestCommand = () => {
+  const baseCommand = getInput('jest-command');
+  const changeSinceParam = generateChangeSinceParam(baseCommand);
+  return `${baseCommand} ${changeSinceParam}`;
+};
