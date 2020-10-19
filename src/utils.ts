@@ -74,7 +74,9 @@ const getBooleanInput = (input: string): boolean | undefined => {
 
 const generateChangeSinceParam = (baseCommand: string) => {
   const param = getBooleanInput('only-changes');
-
+if (!param) {
+   return '';
+}
   if (param === undefined || !context.payload.pull_request?.base_ref) {
     console.warn('only-changes parameter: ', param);
     warning('You need to pass either "true" or "false" as only-changes parameter');
