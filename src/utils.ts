@@ -1,6 +1,6 @@
 import { exec } from '@actions/exec';
 import { context, getOctokit } from '@actions/github';
-import { getInput, warning } from '@actions/core';
+import { error, getInput, warning } from '@actions/core';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -20,8 +20,13 @@ export const execCommand = async (command: string, formatter = stringFormatter):
       }
     }
   };
-  await exec(command, [], options);
-  return Promise.resolve(formatter(output));
+  try {
+    await exec(command, [], options);
+    return Promise.resolve(formatter(output));
+  } catch (e) {
+    error(`ExecCommand error: ${e}`);
+    return Promise.reject(e);
+  }
 };
 
 export const getCoveragePercent = async (): Promise<number> => {
@@ -45,7 +50,6 @@ export const createComment = async (comment: string) => {
   const octokit = getOctokit(getInput('github-token'));
   const issueNumber = getIssueNumber(context.payload);
   if (!issueNumber) {
-    console.log('CONTEXT', context);
     warning('Issue number not found. Impossible to create a comment');
     return;
   }
@@ -82,9 +86,11 @@ const generateChangeSinceParam = (baseCommand: string) => {
     return '';
   }
 
-  if (context.payload.pull_request?.base_ref) {
-    return `--changeSince=${context.payload.pull_request?.base_ref}`;
+  if (context.payload.pull_request?.base) {
+    return `--changeSince=${context.payload.pull_request?.base.ref}`;
   }
+
+  return '';
 };
 
 export const generateJestCommand = () => {

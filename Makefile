@@ -20,6 +20,14 @@ build:
 check: --pre_check test build
 	@echo "✅"
 
+clean:
+	@echo "🛁 Cleaning..."
+	@npm run clean
+
+clean_all: clean
+	@echo "🧨 Clean all"
+	@rm -Rf node_modules package-lock.json
+
 docs:
 	@doctoc README.md
 	@echo "📚 Documentation ready!"
