@@ -126,6 +126,8 @@ const generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 
 exports.generateCoverageSummary = generateCoverageSummary;
 const getBooleanInput = (input) => {
     console.log('>>>', input, core_1.getInput(input));
+    const a = typeof core_1.getInput(input);
+    console.log('><><', a);
     switch (core_1.getInput(input)) {
         case 'true':
             return true;

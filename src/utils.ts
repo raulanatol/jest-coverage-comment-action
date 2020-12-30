@@ -68,6 +68,8 @@ export const generateCoverageSummary = async (jestCommand: string): Promise<stri
 
 const getBooleanInput = (input: string): boolean | undefined => {
   console.log('>>>', input, getInput(input));
+  const a = typeof getInput(input);
+  console.log('><><', a);
   switch (getInput(input)) {
     case 'true':
       return true;
