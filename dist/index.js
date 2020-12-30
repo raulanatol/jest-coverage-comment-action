@@ -139,7 +139,7 @@ const getBooleanInput = (input) => {
     }
 };
 const generateChangeSinceParam = (baseCommand) => {
-    var _a, _b, _c;
+    var _a, _b;
     const param = getBooleanInput('only-changes');
     if (!param) {
         return '';
@@ -147,12 +147,9 @@ const generateChangeSinceParam = (baseCommand) => {
     if (baseCommand.includes('changeSince')) {
         return '';
     }
-    if ((_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base_ref) {
-        return `--changeSince=${(_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.base_ref}`;
+    if ((_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) {
+        return `--changeSince=${(_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.base.ref}`;
     }
-    console.log(1, github_1.context.payload);
-    console.log(2, github_1.context.payload.pull_request);
-    console.log(3, (_c = github_1.context.payload.pull_request) === null || _c === void 0 ? void 0 : _c.base_ref);
     return '';
 };
 const generateJestCommand = () => {

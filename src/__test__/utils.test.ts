@@ -4,7 +4,9 @@ jest.mock('@actions/github', () => ({
   context: {
     payload: {
       pull_request: {
-        base_ref: 'fakeBaseRef'
+        base: {
+          ref: 'fakeBaseRef'
+        }
       }
     }
   }
