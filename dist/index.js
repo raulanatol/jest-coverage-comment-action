@@ -21,6 +21,7 @@ exports.start = void 0;
 const utils_1 = __webpack_require__(918);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const jestCommand = utils_1.generateJestCommand();
+    console.log({ jestCommand });
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
     const percent = yield utils_1.getCoveragePercent();
     const comment = utils_1.generateComment(percent, coverageSummary);
@@ -137,17 +138,13 @@ const getBooleanInput = (input) => {
 const generateChangeSinceParam = (baseCommand) => {
     var _a, _b;
     const param = getBooleanInput('only-changes');
-    console.log('>PARAMS', param);
     if (!param) {
         return '';
     }
-    console.log('>changeSince', baseCommand);
     if (baseCommand.includes('changeSince')) {
         return '';
     }
-    console.log('>context', github_1.context.payload.pull_request);
     if ((_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base) {
-        console.log('>FFF');
         return `--changeSince=${(_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.base.ref}`;
     }
     return '';
@@ -155,7 +152,6 @@ const generateChangeSinceParam = (baseCommand) => {
 const generateJestCommand = () => {
     const baseCommand = core_1.getInput('jest-command');
     const changeSinceParam = generateChangeSinceParam(baseCommand);
-    console.log('CHAN', changeSinceParam);
     return `${baseCommand} ${changeSinceParam}`;
 };
 exports.generateJestCommand = generateJestCommand;

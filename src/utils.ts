@@ -79,19 +79,15 @@ const getBooleanInput = (input: string): boolean | undefined => {
 
 const generateChangeSinceParam = (baseCommand: string) => {
   const param = getBooleanInput('only-changes');
-  console.log('>PARAMS', param);
   if (!param) {
     return '';
   }
 
-  console.log('>changeSince', baseCommand);
   if (baseCommand.includes('changeSince')) {
     return '';
   }
 
-  console.log('>context', context.payload.pull_request);
   if (context.payload.pull_request?.base) {
-    console.log('>FFF');
     return `--changeSince=${context.payload.pull_request?.base.ref}`;
   }
 
@@ -101,6 +97,5 @@ const generateChangeSinceParam = (baseCommand: string) => {
 export const generateJestCommand = () => {
   const baseCommand = getInput('jest-command');
   const changeSinceParam = generateChangeSinceParam(baseCommand);
-  console.log('CHAN', changeSinceParam);
   return `${baseCommand} ${changeSinceParam}`;
 };
