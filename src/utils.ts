@@ -1,6 +1,6 @@
 import { exec } from '@actions/exec';
 import { context, getOctokit } from '@actions/github';
-import { error, getInput, info, warning } from '@actions/core';
+import { error, getInput, warning } from '@actions/core';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -94,7 +94,8 @@ const generateChangeSinceParam = (baseCommand: string) => {
 
 export const generateJestCommand = () => {
   const baseCommand = getInput('jest-command');
-  info(`BaseCommand: ${baseCommand}`);
+  console.log(`BaseCommand: ${baseCommand}`);
   const changeSinceParam = generateChangeSinceParam(baseCommand);
+  console.log({ changeSinceParam });
   return `${baseCommand} ${changeSinceParam}`;
 };
