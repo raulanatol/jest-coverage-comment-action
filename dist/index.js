@@ -19,13 +19,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.start = void 0;
 const utils_1 = __webpack_require__(918);
-exports.start = () => __awaiter(void 0, void 0, void 0, function* () {
+const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const jestCommand = utils_1.generateJestCommand();
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
     const percent = yield utils_1.getCoveragePercent();
     const comment = utils_1.generateComment(percent, coverageSummary);
     yield utils_1.createComment(comment);
 });
+exports.start = start;
 
 
 /***/ }),
@@ -64,9 +65,11 @@ exports.generateJestCommand = exports.generateCoverageSummary = exports.createCo
 const exec_1 = __webpack_require__(1514);
 const github_1 = __webpack_require__(5438);
 const core_1 = __webpack_require__(2186);
-exports.stringFormatter = (input) => input.join('\n');
-exports.summaryFormatter = (input) => exports.stringFormatter(input.slice(1, input.length - 1));
-exports.execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
+const stringFormatter = (input) => input.join('\n');
+exports.stringFormatter = stringFormatter;
+const summaryFormatter = (input) => exports.stringFormatter(input.slice(1, input.length - 1));
+exports.summaryFormatter = summaryFormatter;
+const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
     const output = [];
     const options = {
         silent: true,
@@ -79,21 +82,25 @@ exports.execCommand = (command, formatter = exports.stringFormatter) => __awaite
     yield exec_1.exec(command, [], options);
     return Promise.resolve(formatter(output));
 });
-exports.getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.execCommand = execCommand;
+const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
     return Number(parseFloat(percent).toFixed(2));
 });
-exports.generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
+exports.getCoveragePercent = getCoveragePercent;
+const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
 
 </details>`;
-exports.getIssueNumber = (payload) => {
+exports.generateComment = generateComment;
+const getIssueNumber = (payload) => {
     var _a, _b;
     return ((_a = payload === null || payload === void 0 ? void 0 : payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) || ((_b = payload === null || payload === void 0 ? void 0 : payload.issue) === null || _b === void 0 ? void 0 : _b.number);
 };
-exports.createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
+exports.getIssueNumber = getIssueNumber;
+const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
     const octokit = github_1.getOctokit(core_1.getInput('github-token'));
     const issueNumber = exports.getIssueNumber(github_1.context.payload);
     if (!issueNumber) {
@@ -108,7 +115,9 @@ exports.createComment = (comment) => __awaiter(void 0, void 0, void 0, function*
         issue_number: issueNumber
     });
 });
-exports.generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand, exports.summaryFormatter); });
+exports.createComment = createComment;
+const generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand, exports.summaryFormatter); });
+exports.generateCoverageSummary = generateCoverageSummary;
 const getBooleanInput = (input) => {
     switch (core_1.getInput(input)) {
         case 'true':
@@ -132,11 +141,12 @@ const generateChangeSinceParam = (baseCommand) => {
         return `--changeSince=${(_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.base_ref}`;
     }
 };
-exports.generateJestCommand = () => {
+const generateJestCommand = () => {
     const baseCommand = core_1.getInput('jest-command');
     const changeSinceParam = generateChangeSinceParam(baseCommand);
     return `${baseCommand} ${changeSinceParam}`;
 };
+exports.generateJestCommand = generateJestCommand;
 
 
 /***/ }),
@@ -7082,7 +7092,7 @@ module.exports = eval("require")("encoding");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("assert");
+module.exports = require("assert");;
 
 /***/ }),
 
@@ -7090,7 +7100,7 @@ module.exports = require("assert");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("child_process");
+module.exports = require("child_process");;
 
 /***/ }),
 
@@ -7098,7 +7108,7 @@ module.exports = require("child_process");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("events");
+module.exports = require("events");;
 
 /***/ }),
 
@@ -7106,7 +7116,7 @@ module.exports = require("events");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("fs");
+module.exports = require("fs");;
 
 /***/ }),
 
@@ -7114,7 +7124,7 @@ module.exports = require("fs");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("http");
+module.exports = require("http");;
 
 /***/ }),
 
@@ -7122,7 +7132,7 @@ module.exports = require("http");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("https");
+module.exports = require("https");;
 
 /***/ }),
 
@@ -7130,7 +7140,7 @@ module.exports = require("https");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("net");
+module.exports = require("net");;
 
 /***/ }),
 
@@ -7138,7 +7148,7 @@ module.exports = require("net");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("os");
+module.exports = require("os");;
 
 /***/ }),
 
@@ -7146,7 +7156,7 @@ module.exports = require("os");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("path");
+module.exports = require("path");;
 
 /***/ }),
 
@@ -7154,7 +7164,7 @@ module.exports = require("path");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("stream");
+module.exports = require("stream");;
 
 /***/ }),
 
@@ -7162,7 +7172,7 @@ module.exports = require("stream");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("tls");
+module.exports = require("tls");;
 
 /***/ }),
 
@@ -7170,7 +7180,7 @@ module.exports = require("tls");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("url");
+module.exports = require("url");;
 
 /***/ }),
 
@@ -7178,7 +7188,7 @@ module.exports = require("url");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("util");
+module.exports = require("util");;
 
 /***/ }),
 
@@ -7186,7 +7196,7 @@ module.exports = require("util");
 /***/ ((module) => {
 
 "use strict";
-module.exports = require("zlib");
+module.exports = require("zlib");;
 
 /***/ })
 

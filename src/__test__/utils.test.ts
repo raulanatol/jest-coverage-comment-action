@@ -25,7 +25,7 @@ jest.mock('@actions/core', () => ({
 }));
 
 
-const jestCommandWithChangeSinceOption = `npx jest --coverage --changeSince=fakeBaseRef`;
+const jestCommandWithChangeSinceOption = 'npx jest --coverage --changeSince=fakeBaseRef';
 
 const validJestReportResponse: string[] = [
   '----------|---------|----------|---------|---------|-------------------',
