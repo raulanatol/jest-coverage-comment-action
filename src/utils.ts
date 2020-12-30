@@ -50,7 +50,6 @@ export const createComment = async (comment: string) => {
   const octokit = getOctokit(getInput('github-token'));
   const issueNumber = getIssueNumber(context.payload);
   if (!issueNumber) {
-    console.log('CONTEXT', context);
     warning('Issue number not found. Impossible to create a comment');
     return;
   }
