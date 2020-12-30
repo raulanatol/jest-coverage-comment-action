@@ -90,6 +90,11 @@ const generateChangeSinceParam = (baseCommand: string) => {
   if (context.payload.pull_request?.base_ref) {
     return `--changeSince=${context.payload.pull_request?.base_ref}`;
   }
+
+  console.log(1, context.payload);
+  console.log(2, context.payload.pull_request);
+  console.log(3, context.payload.pull_request?.base_ref);
+  return '';
 };
 
 export const generateJestCommand = () => {
