@@ -1,6 +1,6 @@
 import { exec } from '@actions/exec';
 import { context, getOctokit } from '@actions/github';
-import { getInput, warning } from '@actions/core';
+import { error, getInput, info, warning } from '@actions/core';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -20,8 +20,13 @@ export const execCommand = async (command: string, formatter = stringFormatter):
       }
     }
   };
-  await exec(command, [], options);
-  return Promise.resolve(formatter(output));
+  try {
+    await exec(command, [], options);
+    return Promise.resolve(formatter(output));
+  } catch (e) {
+    error(`ExecCommand error: ${e}`);
+    return Promise.reject(e);
+  }
 };
 
 export const getCoveragePercent = async (): Promise<number> => {
@@ -89,6 +94,7 @@ const generateChangeSinceParam = (baseCommand: string) => {
 
 export const generateJestCommand = () => {
   const baseCommand = getInput('jest-command');
+  info(`BaseCommand: ${baseCommand}`);
   const changeSinceParam = generateChangeSinceParam(baseCommand);
   return `${baseCommand} ${changeSinceParam}`;
 };
