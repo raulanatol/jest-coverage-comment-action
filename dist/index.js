@@ -18,10 +18,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.start = void 0;
-const core_1 = __webpack_require__(2186);
 const utils_1 = __webpack_require__(918);
 exports.start = () => __awaiter(void 0, void 0, void 0, function* () {
-    const jestCommand = core_1.getInput('jest-command');
+    const jestCommand = utils_1.generateJestCommand();
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
     const percent = yield utils_1.getCoveragePercent();
     const comment = utils_1.generateComment(percent, coverageSummary);
@@ -61,7 +60,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
+exports.generateJestCommand = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
 const exec_1 = __webpack_require__(1514);
 const github_1 = __webpack_require__(5438);
 const core_1 = __webpack_require__(2186);
@@ -110,6 +109,34 @@ exports.createComment = (comment) => __awaiter(void 0, void 0, void 0, function*
     });
 });
 exports.generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand, exports.summaryFormatter); });
+const getBooleanInput = (input) => {
+    switch (core_1.getInput(input)) {
+        case 'true':
+            return true;
+        case 'false':
+            return false;
+        default:
+            return undefined;
+    }
+};
+const generateChangeSinceParam = (baseCommand) => {
+    var _a, _b;
+    const param = getBooleanInput('only-changes');
+    if (!param) {
+        return '';
+    }
+    if (baseCommand.includes('changeSince')) {
+        return '';
+    }
+    if ((_a = github_1.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.base_ref) {
+        return `--changeSince=${(_b = github_1.context.payload.pull_request) === null || _b === void 0 ? void 0 : _b.base_ref}`;
+    }
+};
+exports.generateJestCommand = () => {
+    const baseCommand = core_1.getInput('jest-command');
+    const changeSinceParam = generateChangeSinceParam(baseCommand);
+    return `${baseCommand} ${changeSinceParam}`;
+};
 
 
 /***/ }),

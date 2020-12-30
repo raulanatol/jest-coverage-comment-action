@@ -74,9 +74,9 @@ const getBooleanInput = (input: string): boolean | undefined => {
 
 const generateChangeSinceParam = (baseCommand: string) => {
   const param = getBooleanInput('only-changes');
-if (!param) {
-   return '';
-}
+  if (!param) {
+    return '';
+  }
 
   if (baseCommand.includes('changeSince')) {
     return '';

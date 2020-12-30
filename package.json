@@ -18,7 +18,9 @@
     "clean": "shx rm -rf dist lib",
     "lint": "eslint --max-warnings 0 . --ext .ts",
     "package": "ncc build --source-map --license licenses.txt",
-    "test": "jest"
+    "test": "jest",
+    "type-check": "tsc --pretty --noEmit",
+    "build": "tsc"
   },
   "jest": {
     "preset": "ts-jest",
