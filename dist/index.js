@@ -19,13 +19,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.start = void 0;
 const utils_1 = __webpack_require__(918);
-const core_1 = __webpack_require__(2186);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const jestCommand = utils_1.generateJestCommand();
-    core_1.info(`jestCommand: ${jestCommand}`);
-    console.log({ jestCommand });
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
-    console.log({ coverageSummary });
     const percent = yield utils_1.getCoveragePercent();
     const comment = utils_1.generateComment(percent, coverageSummary);
     yield utils_1.createComment(comment);
@@ -129,6 +125,7 @@ exports.createComment = createComment;
 const generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand, exports.summaryFormatter); });
 exports.generateCoverageSummary = generateCoverageSummary;
 const getBooleanInput = (input) => {
+    console.log('>>>', input, core_1.getInput(input));
     switch (core_1.getInput(input)) {
         case 'true':
             return true;
@@ -154,9 +151,7 @@ const generateChangeSinceParam = (baseCommand) => {
 };
 const generateJestCommand = () => {
     const baseCommand = core_1.getInput('jest-command');
-    console.log(`BaseCommand: ${baseCommand}`);
     const changeSinceParam = generateChangeSinceParam(baseCommand);
-    console.log({ changeSinceParam });
     return `${baseCommand} ${changeSinceParam}`;
 };
 exports.generateJestCommand = generateJestCommand;

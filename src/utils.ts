@@ -67,6 +67,7 @@ export const generateCoverageSummary = async (jestCommand: string): Promise<stri
   await execCommand(jestCommand, summaryFormatter);
 
 const getBooleanInput = (input: string): boolean | undefined => {
+  console.log('>>>', input, getInput(input));
   switch (getInput(input)) {
     case 'true':
       return true;
@@ -96,8 +97,6 @@ const generateChangeSinceParam = (baseCommand: string) => {
 
 export const generateJestCommand = () => {
   const baseCommand = getInput('jest-command');
-  console.log(`BaseCommand: ${baseCommand}`);
   const changeSinceParam = generateChangeSinceParam(baseCommand);
-  console.log({ changeSinceParam });
   return `${baseCommand} ${changeSinceParam}`;
 };
