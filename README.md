@@ -33,7 +33,7 @@
 
 ### `jest-command`
 
-**Required** The command used to generate the coverage. Default: `npx jest --coverage`
+**Optional** The command used to generate the coverage. Default: `npx jest --coverage`
 
 ## Example of usage
 
