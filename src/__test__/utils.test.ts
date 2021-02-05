@@ -80,7 +80,7 @@ describe('utils', () => {
     });
 
     test('should return a string that starts after the last empty line', () => {
-      expect(summaryFormatter(['first', 'second', '', 'third', 'fourth'])).toBe('third');
+      expect(summaryFormatter(['first', 'second', 'File', 'third', 'fourth'])).toBe("File\nthird");
     });
 
     test('should return a valid format when a real coverage input was provided', () => {
