@@ -73,7 +73,7 @@ const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(
     const workingDir = core_1.getInput('working-directory');
     const output = [];
     const options = {
-        silent: false,
+        silent: true,
         listeners: {
             stdline: (data) => {
                 output.push(data);
@@ -82,7 +82,6 @@ const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(
         cwd: `./${workingDir}`
     };
     try {
-        console.log('command', command, options);
         yield exec_1.exec(command, [], options);
         return Promise.resolve(formatter(output));
     }
