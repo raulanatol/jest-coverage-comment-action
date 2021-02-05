@@ -5,10 +5,15 @@ import { error, getInput, warning } from '@actions/core';
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
 
+const findTableStart = (search: string, array: string[]) => {
+  const index = array.findIndex((line: string) => line.startsWith(search), search);
+  return (index > 0 ? index : 1);
+};
+
 export const stringFormatter: CommandResultFormatter = (input: string[]) => input.join('\n');
 
 export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
-  stringFormatter(input.slice(input.lastIndexOf('') > 0 ? (input.lastIndexOf('') + 1) : 1, input.length - 1));
+  stringFormatter(input.slice(findTableStart('File', input), input.length - 1));
 
 export const execCommand = async (command: string, formatter = stringFormatter): Promise<string> => {
   const workingDir = getInput('working-directory');
