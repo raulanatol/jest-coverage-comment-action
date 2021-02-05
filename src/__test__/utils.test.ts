@@ -97,7 +97,7 @@ describe('utils', () => {
       const result = generateComment(30, realSummary);
 
       const expected = [
-        '<p>Total Coverage: <code>30</code></p>',
+        '<p>Total Coverage: <code>30 %</code></p>',
         '<details><summary>Coverage report</summary>',
         '',
         'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
