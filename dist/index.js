@@ -96,7 +96,7 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
     return Number(parseFloat(percent).toFixed(2));
 });
 exports.getCoveragePercent = getCoveragePercent;
-const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
+const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
