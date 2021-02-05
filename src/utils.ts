@@ -11,6 +11,7 @@ export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
   stringFormatter(input.slice(1, input.length - 1));
 
 export const execCommand = async (command: string, formatter = stringFormatter): Promise<string> => {
+  const workingDir = getInput('working-directory');
   const output: string[] = [];
   const options = {
     silent: true,
@@ -18,7 +19,8 @@ export const execCommand = async (command: string, formatter = stringFormatter):
       stdline: (data: string) => {
         output.push(data);
       }
-    }
+    },
+    cwd: `./${workingDir}`
   };
   try {
     await exec(command, [], options);
@@ -35,7 +37,7 @@ export const getCoveragePercent = async (): Promise<number> => {
 };
 
 export const generateComment = (percent: number, summary: string): string =>
-  `<p>Total Coverage: <code>${percent}</code></p>
+  `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}

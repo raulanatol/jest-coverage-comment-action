@@ -70,6 +70,7 @@ exports.stringFormatter = stringFormatter;
 const summaryFormatter = (input) => exports.stringFormatter(input.slice(1, input.length - 1));
 exports.summaryFormatter = summaryFormatter;
 const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
+    const workingDir = core_1.getInput('working-directory');
     const output = [];
     const options = {
         silent: true,
@@ -77,7 +78,8 @@ const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(
             stdline: (data) => {
                 output.push(data);
             }
-        }
+        },
+        cwd: `./${workingDir}`
     };
     try {
         yield exec_1.exec(command, [], options);
@@ -94,7 +96,7 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
     return Number(parseFloat(percent).toFixed(2));
 });
 exports.getCoveragePercent = getCoveragePercent;
-const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
+const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}

@@ -13,10 +13,11 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Inputs](#inputs)
   - [`github-token`](#github-token)
   - [`jest-command`](#jest-command)
+  - [`only-changes`](#only-changes)
+  - [`working-directory`](#working-directory)
 - [Example of usage](#example-of-usage)
 - [Example using a custom jest command](#example-using-a-custom-jest-command)
 - [Development](#development)
@@ -33,7 +34,15 @@
 
 ### `jest-command`
 
-**Required** The command used to generate the coverage. Default: `npx jest --coverage`
+**Optional** The command used to generate the coverage. Default: `npx jest --coverage`
+
+### `only-changes`
+
+**Optional** Add parameter to show the coverage only for the changed files. Default: `true`
+
+### `working-directory`
+
+**Optional** The command used to generate the coverage. Default: `''`
 
 ## Example of usage
 
@@ -42,8 +51,8 @@ uses: raulanatol/jest-coverage-comment-action@v1.0.0
 with:
   github-token: ${{ secrets.GITHUB_TOKEN }}'
 ```
-  
-## Example using a custom jest command
+
+## Example using a custom jest command and working directory
 
 **.github/workflows/main.yml**
 
@@ -54,12 +63,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Hello world action step
-      id: hello
-      uses: raulanatol/jest-coverage-comment-action@v1.0.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        jest-command: 'npm run jest-ci'
+      - name: Hello world action step
+        id: hello
+        uses: raulanatol/jest-coverage-comment-action@v1.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          jest-command: 'npm run jest-ci'
+          working-directory: 'packages/my-package'
 ```
 
 ## Development
@@ -72,7 +82,7 @@ Example:
 
 ```shell script
 make release_minor
-``` 
+```
 
 ### Documentation
 
@@ -82,4 +92,4 @@ To generate the documentation you only need to execute the makefile with `docs`.
 
 ```shell script
 make docs
-``` 
+```
