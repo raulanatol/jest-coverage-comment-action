@@ -79,6 +79,10 @@ describe('utils', () => {
       expect(summaryFormatter(['first', 'middle', 'last'])).toBe('middle');
     });
 
+    test('should return a string that starts after the last empty line', () => {
+      expect(summaryFormatter(['first', 'second', '', 'third', 'fourth'])).toBe('third');
+    });
+
     test('should return a valid format when a real coverage input was provided', () => {
       const expected = [
         'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
