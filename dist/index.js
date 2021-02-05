@@ -67,7 +67,7 @@ const github_1 = __webpack_require__(5438);
 const core_1 = __webpack_require__(2186);
 const stringFormatter = (input) => input.join('\n');
 exports.stringFormatter = stringFormatter;
-const summaryFormatter = (input) => exports.stringFormatter(input.slice(1, input.length - 1));
+const summaryFormatter = (input) => exports.stringFormatter(input.slice(input.lastIndexOf(''), input.length - 1));
 exports.summaryFormatter = summaryFormatter;
 const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
     const workingDir = core_1.getInput('working-directory');
