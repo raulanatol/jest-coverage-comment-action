@@ -13,10 +13,10 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Inputs](#inputs)
   - [`github-token`](#github-token)
   - [`jest-command`](#jest-command)
+  - [`only-changes`](#only-changes)
 - [Example of usage](#example-of-usage)
 - [Example using a custom jest command](#example-using-a-custom-jest-command)
 - [Development](#development)
@@ -35,6 +35,9 @@
 
 **Optional** The command used to generate the coverage. Default: `npx jest --coverage`
 
+### `only-changes`
+
+**Optional** Add parameter to show the coverage only for the changed files. Default: `true`
 ## Example of usage
 
 ```yaml
