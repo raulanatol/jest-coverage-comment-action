@@ -11,16 +11,19 @@ export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
   stringFormatter(input.slice(1, input.length - 1));
 
 export const execCommand = async (command: string, formatter = stringFormatter): Promise<string> => {
+  const workingDir = getInput('working-directory');
   const output: string[] = [];
   const options = {
-    silent: true,
+    silent: false,
     listeners: {
       stdline: (data: string) => {
         output.push(data);
       }
-    }
+    },
+    cwd: `./${workingDir}`
   };
   try {
+    console.log('command', command, options);
     await exec(command, [], options);
     return Promise.resolve(formatter(output));
   } catch (e) {
