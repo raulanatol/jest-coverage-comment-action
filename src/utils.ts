@@ -8,7 +8,7 @@ type CommandResultFormatter = (input: string[]) => string;
 export const stringFormatter: CommandResultFormatter = (input: string[]) => input.join('\n');
 
 export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
-  stringFormatter(input.slice(input.lastIndexOf(''), input.length - 1));
+  stringFormatter(input.slice(input.lastIndexOf('') > 0 ? (input.lastIndexOf('') + 1) : 1, input.length - 1));
 
 export const execCommand = async (command: string, formatter = stringFormatter): Promise<string> => {
   const workingDir = getInput('working-directory');
