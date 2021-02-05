@@ -37,7 +37,7 @@ export const getCoveragePercent = async (): Promise<number> => {
 };
 
 export const generateComment = (percent: number, summary: string): string =>
-  `<p>Total Coverage: <code>${percent}</code></p>
+  `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
