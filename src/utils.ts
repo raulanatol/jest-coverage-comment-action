@@ -14,7 +14,7 @@ export const execCommand = async (command: string, formatter = stringFormatter):
   const workingDir = getInput('working-directory');
   const output: string[] = [];
   const options = {
-    silent: false,
+    silent: true,
     listeners: {
       stdline: (data: string) => {
         output.push(data);
@@ -23,7 +23,6 @@ export const execCommand = async (command: string, formatter = stringFormatter):
     cwd: `./${workingDir}`
   };
   try {
-    console.log('command', command, options);
     await exec(command, [], options);
     return Promise.resolve(formatter(output));
   } catch (e) {
