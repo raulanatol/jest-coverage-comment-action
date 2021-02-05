@@ -70,16 +70,19 @@ exports.stringFormatter = stringFormatter;
 const summaryFormatter = (input) => exports.stringFormatter(input.slice(1, input.length - 1));
 exports.summaryFormatter = summaryFormatter;
 const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
+    const workingDir = core_1.getInput('working-directory');
     const output = [];
     const options = {
-        silent: true,
+        silent: false,
         listeners: {
             stdline: (data) => {
                 output.push(data);
             }
-        }
+        },
+        cwd: `./${workingDir}`
     };
     try {
+        console.log('command', command, options);
         yield exec_1.exec(command, [], options);
         return Promise.resolve(formatter(output));
     }
