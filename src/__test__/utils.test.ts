@@ -79,6 +79,10 @@ describe('utils', () => {
       expect(summaryFormatter(['first', 'middle', 'last'])).toBe('middle');
     });
 
+    test('should return a string that starts after the last empty line', () => {
+      expect(summaryFormatter(['first', 'second', 'File', 'third', 'fourth'])).toBe('File\nthird');
+    });
+
     test('should return a valid format when a real coverage input was provided', () => {
       const expected = [
         'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
@@ -97,7 +101,7 @@ describe('utils', () => {
       const result = generateComment(30, realSummary);
 
       const expected = [
-        '<p>Total Coverage: <code>30</code></p>',
+        '<p>Total Coverage: <code>30 %</code></p>',
         '<details><summary>Coverage report</summary>',
         '',
         'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',

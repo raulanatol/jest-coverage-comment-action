@@ -65,11 +65,16 @@ exports.generateJestCommand = exports.generateCoverageSummary = exports.createCo
 const exec_1 = __webpack_require__(1514);
 const github_1 = __webpack_require__(5438);
 const core_1 = __webpack_require__(2186);
+const findTableStart = (search, array) => {
+    const index = array.findIndex((line) => line.startsWith(search), search);
+    return (index > 0 ? index : 1);
+};
 const stringFormatter = (input) => input.join('\n');
 exports.stringFormatter = stringFormatter;
-const summaryFormatter = (input) => exports.stringFormatter(input.slice(1, input.length - 1));
+const summaryFormatter = (input) => exports.stringFormatter(input.slice(findTableStart('File', input), input.length - 1));
 exports.summaryFormatter = summaryFormatter;
 const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
+    const workingDir = core_1.getInput('working-directory');
     const output = [];
     const options = {
         silent: true,
@@ -77,7 +82,8 @@ const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(
             stdline: (data) => {
                 output.push(data);
             }
-        }
+        },
+        cwd: `./${workingDir}`
     };
     try {
         yield exec_1.exec(command, [], options);
@@ -94,7 +100,7 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
     return Number(parseFloat(percent).toFixed(2));
 });
 exports.getCoveragePercent = getCoveragePercent;
-const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent}</code></p>
+const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}

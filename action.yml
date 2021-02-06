@@ -16,6 +16,10 @@ inputs:
     description: 'Add parameter to show the coverage only for the changed files'
     required: false
     default: 'true'
+  working-directory:
+    description: 'Specify a directory where npm command has to be executed'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'
