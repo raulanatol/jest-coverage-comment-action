@@ -65,13 +65,9 @@ exports.generateJestCommand = exports.generateCoverageSummary = exports.createCo
 const exec_1 = __webpack_require__(1514);
 const github_1 = __webpack_require__(5438);
 const core_1 = __webpack_require__(2186);
-const findTableStart = (search, array) => {
-    const index = array.findIndex((line) => line.startsWith(search), search);
-    return (index > 0 ? index : 1);
-};
 const stringFormatter = (input) => input.join('\n');
 exports.stringFormatter = stringFormatter;
-const summaryFormatter = (input) => exports.stringFormatter(input.slice(findTableStart('File', input), input.length - 1));
+const summaryFormatter = (input) => exports.stringFormatter(input.slice(input.lastIndexOf(''), input.length - 1));
 exports.summaryFormatter = summaryFormatter;
 const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
     const workingDir = core_1.getInput('working-directory');
