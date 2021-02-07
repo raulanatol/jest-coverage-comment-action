@@ -20,6 +20,10 @@ inputs:
     description: 'Specify a directory where npm command has to be executed'
     required: false
     default: ''
+  delete-previous:
+    description: 'Delete previous comments before adding a new one'
+    required: false
+    default: 'true'
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -74,12 +74,15 @@ export const getIssueNumber = (payload): number | undefined =>
 export const createComment = async (comment: string) => {
   const octokit = getOctokit(getInput('github-token'));
   const issueNumber = getIssueNumber(context.payload);
+  const deletePrev = getBooleanInput('delete-previous');
   if (!issueNumber) {
     warning('Issue number not found. Impossible to create a comment');
     return;
   }
 
-  await deletePreviousComments(issueNumber);
+  if(deletePrev) {
+    await deletePreviousComments(issueNumber);
+  }
 
   await octokit.issues.createComment({
     repo: context.repo.repo,

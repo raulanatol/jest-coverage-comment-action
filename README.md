@@ -18,6 +18,7 @@
   - [`jest-command`](#jest-command)
   - [`only-changes`](#only-changes)
   - [`working-directory`](#working-directory)
+  - [`delete-previous`](#delete-previous)
 - [Example of usage](#example-of-usage)
 - [Example using a custom jest command](#example-using-a-custom-jest-command)
 - [Development](#development)
@@ -43,6 +44,10 @@
 ### `working-directory`
 
 **Optional** The command used to generate the coverage. Default: `''`
+
+### `delete-previous`
+
+**Optional** Delete previous comments before adding a new one. Default: `true`
 
 ## Example of usage
 

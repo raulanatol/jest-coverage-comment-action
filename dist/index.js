@@ -122,11 +122,14 @@ exports.getIssueNumber = getIssueNumber;
 const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* () {
     const octokit = github_1.getOctokit(core_1.getInput('github-token'));
     const issueNumber = exports.getIssueNumber(github_1.context.payload);
+    const deletePrev = getBooleanInput('delete-previous');
     if (!issueNumber) {
         core_1.warning('Issue number not found. Impossible to create a comment');
         return;
     }
-    yield deletePreviousComments(issueNumber);
+    if (deletePrev) {
+        yield deletePreviousComments(issueNumber);
+    }
     yield octokit.issues.createComment({
         repo: github_1.context.repo.repo,
         owner: github_1.context.repo.owner,
