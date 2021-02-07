@@ -107,6 +107,13 @@ ${summary}
 
 </details>`;
 exports.generateComment = generateComment;
+const deletePreviousComments = (issueNumber) => __awaiter(void 0, void 0, void 0, function* () {
+    const octokit = github_1.getOctokit(core_1.getInput('github-token'));
+    const { data } = yield octokit.issues.listComments(Object.assign(Object.assign({}, github_1.context.repo), { per_page: 100, issue_number: issueNumber }));
+    return Promise.all(data
+        .filter((c) => c.user && c.body && c.user.login === 'github-actions[bot]' && c.body.indexOf('Total Coverage') !== -1)
+        .map((c) => octokit.issues.deleteComment(Object.assign(Object.assign({}, github_1.context.repo), { comment_id: c.id }))));
+});
 const getIssueNumber = (payload) => {
     var _a, _b;
     return ((_a = payload === null || payload === void 0 ? void 0 : payload.pull_request) === null || _a === void 0 ? void 0 : _a.number) || ((_b = payload === null || payload === void 0 ? void 0 : payload.issue) === null || _b === void 0 ? void 0 : _b.number);
@@ -119,6 +126,7 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
         core_1.warning('Issue number not found. Impossible to create a comment');
         return;
     }
+    yield deletePreviousComments(issueNumber);
     yield octokit.issues.createComment({
         repo: github_1.context.repo.repo,
         owner: github_1.context.repo.owner,
