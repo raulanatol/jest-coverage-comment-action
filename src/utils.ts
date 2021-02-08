@@ -49,21 +49,28 @@ ${summary}
 
 </details>`;
 
+const isPreviousTotalCoverageComment = comment => {
+  comment.user &&
+  comment.body &&
+  comment.user.login === 'github-actions[bot]' &&
+  comment.body.includes('Total Coverage');
+};
+
+const deleteComment = octokit => comment =>
+  octokit.issues.deleteComment({ ...context.repo, comment_id: comment.id });
+
 const deletePreviousComments = async (issueNumber: number) => {
   const octokit = getOctokit(getInput('github-token'));
-  const { data } = await octokit.issues.listComments({
+  const { data: comments } = await octokit.issues.listComments({
     ...context.repo,
     per_page: 100,
     issue_number: issueNumber
   });
 
   return Promise.all(
-    data
-      .filter(
-        (c) =>
-          c.user && c.body && c.user.login === 'github-actions[bot]' && c.body.indexOf('Total Coverage') !== -1
-      )
-      .map((c) => octokit.issues.deleteComment({ ...context.repo, comment_id: c.id }))
+    comments
+    .filter(isPreviousTotalCoverageComment)
+    .map(deleteComment(octokit))
   );
 };
 
