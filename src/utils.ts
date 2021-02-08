@@ -49,6 +49,31 @@ ${summary}
 
 </details>`;
 
+const isPreviousTotalCoverageComment = comment => {
+  comment.user &&
+  comment.body &&
+  comment.user.login === 'github-actions[bot]' &&
+  comment.body.includes('Total Coverage');
+};
+
+const deleteComment = octokit => comment =>
+  octokit.issues.deleteComment({ ...context.repo, comment_id: comment.id });
+
+const deletePreviousComments = async (issueNumber: number) => {
+  const octokit = getOctokit(getInput('github-token'));
+  const { data: comments } = await octokit.issues.listComments({
+    ...context.repo,
+    per_page: 100,
+    issue_number: issueNumber
+  });
+
+  return Promise.all(
+    comments
+    .filter(isPreviousTotalCoverageComment)
+    .map(deleteComment(octokit))
+  );
+};
+
 export const getIssueNumber = (payload): number | undefined =>
   payload?.pull_request?.number ||
   payload?.issue?.number;
@@ -56,9 +81,14 @@ export const getIssueNumber = (payload): number | undefined =>
 export const createComment = async (comment: string) => {
   const octokit = getOctokit(getInput('github-token'));
   const issueNumber = getIssueNumber(context.payload);
+  const deletePrev = getBooleanInput('delete-previous');
   if (!issueNumber) {
     warning('Issue number not found. Impossible to create a comment');
     return;
+  }
+
+  if (deletePrev) {
+    await deletePreviousComments(issueNumber);
   }
 
   await octokit.issues.createComment({
