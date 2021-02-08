@@ -80,7 +80,7 @@ export const createComment = async (comment: string) => {
     return;
   }
 
-  if(deletePrev) {
+  if (deletePrev) {
     await deletePreviousComments(issueNumber);
   }
 
