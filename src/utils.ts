@@ -49,12 +49,12 @@ ${summary}
 
 </details>`;
 
-const isPreviousTotalCoverageComment = comment => {
+const isPreviousTotalCoverageComment = comment => (
   comment.user &&
   comment.body &&
   comment.user.login === 'github-actions[bot]' &&
-  comment.body.includes('Total Coverage');
-};
+  comment.body.includes('Total Coverage')
+);
 
 const deleteComment = octokit => comment =>
   octokit.issues.deleteComment({ ...context.repo, comment_id: comment.id });

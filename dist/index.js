@@ -107,12 +107,10 @@ ${summary}
 
 </details>`;
 exports.generateComment = generateComment;
-const isPreviousTotalCoverageComment = comment => {
-    comment.user &&
-        comment.body &&
-        comment.user.login === 'github-actions[bot]' &&
-        comment.body.includes('Total Coverage');
-};
+const isPreviousTotalCoverageComment = comment => (comment.user &&
+    comment.body &&
+    comment.user.login === 'github-actions[bot]' &&
+    comment.body.includes('Total Coverage'));
 const deleteComment = octokit => comment => octokit.issues.deleteComment(Object.assign(Object.assign({}, github_1.context.repo), { comment_id: comment.id }));
 const deletePreviousComments = (issueNumber) => __awaiter(void 0, void 0, void 0, function* () {
     const octokit = github_1.getOctokit(core_1.getInput('github-token'));
