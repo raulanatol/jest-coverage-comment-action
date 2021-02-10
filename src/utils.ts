@@ -32,6 +32,7 @@ export const execCommand = async (command: string, formatter = stringFormatter):
     return Promise.resolve(formatter(output));
   } catch (e) {
     error(`ExecCommand error: ${e}`);
+    error(`Command: ${command}`);
     return Promise.reject(e);
   }
 };
@@ -69,8 +70,8 @@ const deletePreviousComments = async (issueNumber: number) => {
 
   return Promise.all(
     comments
-    .filter(isPreviousTotalCoverageComment)
-    .map(deleteComment(octokit))
+      .filter(isPreviousTotalCoverageComment)
+      .map(deleteComment(octokit))
   );
 };
 
