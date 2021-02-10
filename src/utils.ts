@@ -31,7 +31,7 @@ export const execCommand = async (command: string, formatter = stringFormatter):
     await exec(command, [], options);
     return Promise.resolve(formatter(output));
   } catch (e) {
-    error(`ExecCommand error: ${e}`);
+    error(`ExecCommand - error: ${e}`);
     error(`Command: ${command}`);
     return Promise.reject(e);
   }
