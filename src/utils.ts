@@ -2,6 +2,7 @@ import { exec } from '@actions/exec';
 import { context } from '@actions/github';
 import { error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
+import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
 
 // eslint-disable-next-line no-unused-vars
@@ -40,6 +41,11 @@ export const execCommand = async (command: string, formatter = stringFormatter):
 };
 
 export const getCoveragePercent = async (): Promise<number> => {
+  const existsTestCoverageResult = fs.existsSync('./coverage/lcov.info');
+  if (!existsTestCoverageResult) {
+    return 0;
+  }
+
   const percent = await execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
   return Number(parseFloat(percent).toFixed(2));
 };

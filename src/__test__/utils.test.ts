@@ -1,4 +1,5 @@
-import { generateComment, generateJestCommand, getIssueNumber, stringFormatter, summaryFormatter } from '../utils';
+import { generateComment, generateJestCommand, getCoveragePercent, getIssueNumber, stringFormatter, summaryFormatter } from '../utils';
+import { exec } from '@actions/exec';
 
 jest.mock('@actions/github', () => ({
   context: {
@@ -24,6 +25,10 @@ jest.mock('@actions/core', () => ({
   warning: () => {
     return jest.fn();
   }
+}));
+
+jest.mock('@actions/exec', () => ({
+  exec: jest.fn()
 }));
 
 
@@ -119,6 +124,28 @@ describe('utils', () => {
     it('should return the jest command with the changeSince option', () => {
       const result = generateJestCommand();
       expect(result).toBe(jestCommandWithChangeSinceOption);
+    });
+  });
+
+  describe('getCoveragePercent', () => {
+    it('should returns 0 when ./coverage/lcov.info file does not exists', async () => {
+      const fs = require('fs');
+      fs.existsSync = jest.fn().mockReturnValue(false);
+
+      expect(await getCoveragePercent()).toBe(0);
+    });
+
+    it('should call to an external command if the ./coverage/lcov.info file exists', async () => {
+      const fs = require('fs');
+      fs.existsSync = jest.fn().mockReturnValue(true);
+
+      await getCoveragePercent();
+
+      expect(exec).toBeCalledWith(
+        'npx coverage-percentage ./coverage/lcov.info --lcov',
+        [],
+        expect.anything()
+      );
     });
   });
 });
