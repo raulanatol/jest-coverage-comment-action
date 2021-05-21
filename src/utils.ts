@@ -1,6 +1,8 @@
 import { exec } from '@actions/exec';
-import { context, getOctokit } from '@actions/github';
+import { context } from '@actions/github';
 import { error, getInput, warning } from '@actions/core';
+import { getRestClient } from './gitHubAPI';
+import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -10,7 +12,8 @@ const findTableStart = (search: string, array: string[]) => {
   return (index > 0 ? index : 1);
 };
 
-export const stringFormatter: CommandResultFormatter = (input: string[]) => input.join('\n');
+export const stringFormatter: CommandResultFormatter = (input: string[]) =>
+  input.join('\n');
 
 export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
   stringFormatter(input.slice(findTableStart('File', input), input.length - 1));
@@ -56,12 +59,12 @@ const isPreviousTotalCoverageComment = comment => (
   comment.body.includes('Total Coverage')
 );
 
-const deleteComment = octokit => comment =>
-  octokit.issues.deleteComment({ ...context.repo, comment_id: comment.id });
+const deleteComment = (gitHub: RestEndpointMethods) => comment =>
+  gitHub.issues.deleteComment({ ...context.repo, comment_id: comment.id });
 
 const deletePreviousComments = async (issueNumber: number) => {
-  const octokit = getOctokit(getInput('github-token'));
-  const { data: comments } = await octokit.issues.listComments({
+  const gitHub = getRestClient();
+  const { data: comments } = await gitHub.issues.listComments({
     ...context.repo,
     per_page: 100,
     issue_number: issueNumber
@@ -69,8 +72,8 @@ const deletePreviousComments = async (issueNumber: number) => {
 
   return Promise.all(
     comments
-    .filter(isPreviousTotalCoverageComment)
-    .map(deleteComment(octokit))
+      .filter(isPreviousTotalCoverageComment)
+      .map(deleteComment(gitHub))
   );
 };
 
@@ -79,19 +82,18 @@ export const getIssueNumber = (payload): number | undefined =>
   payload?.issue?.number;
 
 export const createComment = async (comment: string) => {
-  const octokit = getOctokit(getInput('github-token'));
   const issueNumber = getIssueNumber(context.payload);
-  const deletePrev = getBooleanInput('delete-previous');
   if (!issueNumber) {
     warning('Issue number not found. Impossible to create a comment');
     return;
   }
 
+  const deletePrev = getBooleanInput('delete-previous');
   if (deletePrev) {
     await deletePreviousComments(issueNumber);
   }
 
-  await octokit.issues.createComment({
+  await getRestClient().issues.createComment({
     repo: context.repo.repo,
     owner: context.repo.owner,
     body: comment,
