@@ -40,9 +40,11 @@ export const execCommand = async (command: string, formatter = stringFormatter):
   }
 };
 
+export const existsCoverageReport = () =>
+  fs.existsSync('./coverage/lcov.info');
+
 export const getCoveragePercent = async (): Promise<number> => {
-  const existsTestCoverageResult = fs.existsSync('./coverage/lcov.info');
-  if (!existsTestCoverageResult) {
+  if (!existsCoverageReport()) {
     return 0;
   }
 
@@ -107,8 +109,29 @@ export const createComment = async (comment: string) => {
   });
 };
 
-export const generateCoverageSummary = async (jestCommand: string): Promise<string> =>
-  await execCommand(jestCommand, summaryFormatter);
+const needExecuteCoverageSummary = () => {
+  const useExistingReports = getBooleanInput('use-existing-reports');
+  if (!useExistingReports) {
+    return true;
+  }
+
+  // Even when the user configures the action to avoid execute tests,
+  // if the coverage report was not found, we need to execute a new tests command
+  if (!existsCoverageReport()) {
+    warning('No coverage report found!');
+    return true;
+  }
+
+  return false;
+};
+
+export const generateCoverageSummary = async (jestCommand: string): Promise<string> => {
+  if (needExecuteCoverageSummary()) {
+    return await execCommand(jestCommand, summaryFormatter);
+  }
+  // The use-existing-reports do not generate a summary
+  return '';
+};
 
 const getBooleanInput = (input: string): boolean | undefined => {
   switch (getInput(input)) {
