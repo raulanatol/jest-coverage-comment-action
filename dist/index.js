@@ -82,7 +82,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateJestCommand = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
+exports.generateJestCommand = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.existsCoverageReport = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
@@ -118,9 +118,10 @@ const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(
     }
 });
 exports.execCommand = execCommand;
+const existsCoverageReport = () => fs.existsSync('./coverage/lcov.info');
+exports.existsCoverageReport = existsCoverageReport;
 const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
-    const existsTestCoverageResult = fs.existsSync('./coverage/lcov.info');
-    if (!existsTestCoverageResult) {
+    if (!exports.existsCoverageReport()) {
         return 0;
     }
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
@@ -170,7 +171,26 @@ const createComment = (comment) => __awaiter(void 0, void 0, void 0, function* (
     });
 });
 exports.createComment = createComment;
-const generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () { return yield exports.execCommand(jestCommand, exports.summaryFormatter); });
+const needExecuteCoverageSummary = () => {
+    const useExistingReports = getBooleanInput('use-existing-reports');
+    if (!useExistingReports) {
+        return true;
+    }
+    // Even when the user configures the action to avoid execute tests,
+    // if the coverage report was not found, we need to execute a new tests command
+    if (!exports.existsCoverageReport()) {
+        core_1.warning('No coverage report found!');
+        return true;
+    }
+    return false;
+};
+const generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 0, function* () {
+    if (needExecuteCoverageSummary()) {
+        return yield exports.execCommand(jestCommand, exports.summaryFormatter);
+    }
+    // The use-existing-reports do not generate a summary
+    return '';
+});
 exports.generateCoverageSummary = generateCoverageSummary;
 const getBooleanInput = (input) => {
     switch (core_1.getInput(input)) {

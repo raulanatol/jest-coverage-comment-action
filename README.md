@@ -49,6 +49,10 @@
 
 **Optional** Delete previous comments before adding a new one. Default: `true`
 
+### `use-existing-reports`
+
+**Optional** If already exists a coverage report the action uses it and doesn't run tests again. Default: `false`
+
 ## Example of usage
 
 ```yaml

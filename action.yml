@@ -24,6 +24,10 @@ inputs:
     description: 'Delete previous comments before adding a new one'
     required: false
     default: 'true'
+  use-existing-reports:
+    description: 'Use existing coverage report fi exists, and do not run the tests'
+    required: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'dist/index.js'
