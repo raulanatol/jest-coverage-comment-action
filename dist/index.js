@@ -188,8 +188,9 @@ const generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 
     if (needExecuteCoverageSummary()) {
         return yield exports.execCommand(jestCommand, exports.summaryFormatter);
     }
-    // The use-existing-reports do not generate a summary
-    return '';
+    // Using nyc to generate the report
+    const command = 'npx nyc report -t coverage --report=json-summary';
+    return yield exports.execCommand(command);
 });
 exports.generateCoverageSummary = generateCoverageSummary;
 const getBooleanInput = (input) => {
