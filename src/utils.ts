@@ -129,8 +129,10 @@ export const generateCoverageSummary = async (jestCommand: string): Promise<stri
   if (needExecuteCoverageSummary()) {
     return await execCommand(jestCommand, summaryFormatter);
   }
-  // The use-existing-reports do not generate a summary
-  return '';
+
+  // Using nyc to generate the report
+  const command = 'npx nyc report -t coverage --report=json-summary';
+  return await execCommand(command);
 };
 
 const getBooleanInput = (input: string): boolean | undefined => {
