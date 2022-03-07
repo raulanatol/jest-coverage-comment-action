@@ -1,5 +1,6 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
+import * as cache from '@actions/cache';
 import { error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
@@ -49,11 +50,15 @@ export const getCoveragePercent = async (): Promise<number> => {
   }
 
   const percent = await execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
-  return Number(parseFloat(percent).toFixed(2));
+  const formattedPercent = Number(parseFloat(percent).toFixed(2));
+
+  setMainCoverageValue(formattedPercent);
+
+  return formattedPercent;
 };
 
 export const generateComment = (percent: number, summary: string): string =>
-  `<p>Total Coverage: <code>${percent} %</code></p>
+  `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${getCoveragePercent()} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -167,4 +172,38 @@ export const generateJestCommand = () => {
   const baseCommand = getInput('jest-command');
   const changeSinceParam = generateChangeSinceParam(baseCommand);
   return `${baseCommand} ${changeSinceParam}`;
+};
+
+interface CacheValue {
+  paths: string[];
+  key: string;
+}
+const mainCoverageCacheFile: CacheValue = {
+  paths: ['coverageStatusHistory11111.txt'],
+  key: 'coverageStatusHistory'
+};
+export const getMainCoverageValue = async (): Promise<number> => {
+  console.log('Restoriing cache');
+  const cacheKey = await cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
+  console.log('cacheKey:', cacheKey);
+  if (cacheKey) {
+    console.log('File coverageStatusHistory.txt found');
+    const command = `tail -1 ./${mainCoverageCacheFile.paths[0]}`;
+    const output = await execCommand(command);
+    console.log(`tail ./${mainCoverageCacheFile.paths[0]}`, output);
+    return 66;
+  }
+  return -1;
+};
+
+export const setMainCoverageValue = async (coverage: number): Promise<void> => {
+  try {
+    const data = `${new Date().toISOString} - ${coverage}`;
+    const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
+    const output = await execCommand(command);
+    console.log('setMainCoverageValue command output', output);
+    await cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
+  } catch (error) {
+    console.error(`File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${error}`);
+  }
 };
