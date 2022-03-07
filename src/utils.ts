@@ -1,6 +1,7 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
 import * as cache from '@actions/cache';
+import * as core from '@actions/core';
 import { error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
@@ -183,14 +184,14 @@ const mainCoverageCacheFile: CacheValue = {
   key: 'coverageStatusHistory'
 };
 export const getMainCoverageValue = async (): Promise<number> => {
-  console.log('Restoriing cache');
+  core.debug('Restoriing cache');
   const cacheKey = await cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
-  console.log('cacheKey:', cacheKey);
+  core.debug(`cacheKey: ${cacheKey}`);
   if (cacheKey) {
-    console.log('File coverageStatusHistory.txt found');
+    core.debug('File coverageStatusHistory.txt found');
     const command = `tail -1 ./${mainCoverageCacheFile.paths[0]}`;
     const output = await execCommand(command);
-    console.log(`tail ./${mainCoverageCacheFile.paths[0]}`, output);
+    core.debug(`tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
     return 66;
   }
   return -1;
@@ -201,9 +202,9 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
     const data = `${new Date().toISOString} - ${coverage}`;
     const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
     const output = await execCommand(command);
-    console.log('setMainCoverageValue command output', output);
+    core.debug(`setMainCoverageValue command output ${output}`);
     await cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
   } catch (error) {
-    console.error(`File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${error}`);
+    core.error(`File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${error}`);
   }
 };
