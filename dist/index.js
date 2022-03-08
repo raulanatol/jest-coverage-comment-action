@@ -140,7 +140,7 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.getCoveragePercent = getCoveragePercent;
 const generateComment = (percent, summary) => __awaiter(void 0, void 0, void 0, function* () {
-    const mainCoveragePercent = yield exports.getMainCoverageValue();
+    const mainCoveragePercent = 55; //await getMainCoverageValue();
     return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainCoveragePercent} %</code></p>
 <details><summary>Coverage report</summary>
 
@@ -237,36 +237,44 @@ const generateJestCommand = () => {
     return `${baseCommand} ${changeSinceParam}`;
 };
 exports.generateJestCommand = generateJestCommand;
-const mainCoverageCacheFile = {
-    paths: ['coverageStatusHistory11111.txt'],
-    key: 'coverageStatusHistory'
+const mainCoverageCache = {
+    paths: ['coverageStatusHistory'],
+    key: 'coverageStatusHistory2'
 };
+const mainCoverageCacheFile = './coverageStatusHistory/coverageMain.txt';
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] getMainCoverageValue - Restoring cache');
-    const cacheKey = yield cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
+    const cacheKey = yield cache.restoreCache(mainCoverageCache.paths, mainCoverageCache.key);
     core_1.info(` [action] cacheKey: ${cacheKey}`);
     if (cacheKey) {
-        core_1.info(' [action] File coverageStatusHistory.txt found');
-        const command = `tail -1 ./${mainCoverageCacheFile.paths[0]}`;
+        core_1.info(' [action] Folder coverageStatusHistory found');
+        const command = `tail -1 ./${mainCoverageCacheFile}`;
         const output = yield exports.execCommand(command);
-        core_1.info(` [action] tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
+        core_1.info(` [action] ${command} --> ${output}`);
         return 66;
     }
     return -1;
 });
 exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
+    core_1.info(' [action] setMainCoverageValue - Setting cache');
     try {
+        const command3 = `mkdir ${mainCoverageCache.paths[0]}`;
+        const output3 = yield exports.execCommand(command3);
+        core_1.info(` [action] ${command3} --> ${output3}`);
         const data = `${new Date().toISOString()} - ${coverage}`;
-        const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
+        const command = `echo "${data}" >> ./${mainCoverageCacheFile}`;
         core_1.info(`Command to be executed: ${command}`);
         const output = yield exports.execCommand(command);
-        core_1.info(` [action] setMainCoverageValue command output ${output}`);
-        yield cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
+        core_1.info(` [action] ${command} --> ${output}`);
+        const command2 = `tail -1 ./${mainCoverageCacheFile}`;
+        const output2 = yield exports.execCommand(command2);
+        core_1.info(` [action] ${command2} --> ${output2}`);
+        yield cache.saveCache(mainCoverageCache.paths, mainCoverageCache.key);
     }
     catch (errorMsg) {
-        core_1.info(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
-        core_1.error(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
+        core_1.info(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
+        core_1.error(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
     }
 });
 exports.setMainCoverageValue = setMainCoverageValue;

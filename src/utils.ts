@@ -58,7 +58,7 @@ export const getCoveragePercent = async (): Promise<number> => {
 };
 
 export const generateComment = async (percent: number, summary: string): Promise<string> => {
-  const mainCoveragePercent = await getMainCoverageValue();
+  const mainCoveragePercent = 55; //await getMainCoverageValue();
   return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainCoveragePercent} %</code></p>
 <details><summary>Coverage report</summary>
 
@@ -180,34 +180,47 @@ interface CacheValue {
   paths: string[];
   key: string;
 }
-const mainCoverageCacheFile: CacheValue = {
-  paths: ['coverageStatusHistory11111.txt'],
-  key: 'coverageStatusHistory'
+const mainCoverageCache: CacheValue = {
+  paths: ['coverageStatusHistory'],
+  key: 'coverageStatusHistory2'
 };
+
+const mainCoverageCacheFile = './coverageStatusHistory/coverageMain.txt';
+
 export const getMainCoverageValue = async (): Promise<number> => {
   info(' [action] getMainCoverageValue - Restoring cache');
-  const cacheKey = await cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
+  const cacheKey = await cache.restoreCache(mainCoverageCache.paths, mainCoverageCache.key);
   info(` [action] cacheKey: ${cacheKey}`);
   if (cacheKey) {
-    info(' [action] File coverageStatusHistory.txt found');
-    const command = `tail -1 ./${mainCoverageCacheFile.paths[0]}`;
+    info(' [action] Folder coverageStatusHistory found');
+    const command = `tail -1 ./${mainCoverageCacheFile}`;
     const output = await execCommand(command);
-    info(` [action] tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
+    info(` [action] ${command} --> ${output}`);
     return 66;
   }
   return -1;
 };
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
+  info(' [action] setMainCoverageValue - Setting cache');
   try {
+
+    const command3 = `mkdir ${mainCoverageCache.paths[0]}`;
+    const output3 = await execCommand(command3);
+    info(` [action] ${command3} --> ${output3}`);
+
     const data = `${new Date().toISOString()} - ${coverage}`;
-    const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
+    const command = `echo "${data}" >> ./${mainCoverageCacheFile}`;
     info(`Command to be executed: ${command}`);
     const output = await execCommand(command);
-    info(` [action] setMainCoverageValue command output ${output}`);
-    await cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
+    info(` [action] ${command} --> ${output}`);
+
+    const command2 = `tail -1 ./${mainCoverageCacheFile}`;
+    const output2 = await execCommand(command2);
+    info(` [action] ${command2} --> ${output2}`);
+    await cache.saveCache(mainCoverageCache.paths, mainCoverageCache.key);
   } catch (errorMsg) {
-    info(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
-    error(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
+    info(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
+    error(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
   }
 };
