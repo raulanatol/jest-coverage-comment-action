@@ -7482,7 +7482,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const action_1 = __nccwpck_require__(9139);
 action_1.start()
-    .then(() => core_1.info('Finished!'))
+    .then(() => core_1.info('Finished!Main1'))
     .catch(error => core_1.setFailed(error.message));
 
 })();
