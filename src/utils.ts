@@ -1,8 +1,7 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
 import * as cache from '@actions/cache';
-import * as core from '@actions/core';
-import { error, getInput, warning } from '@actions/core';
+import { debug, error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
@@ -58,13 +57,15 @@ export const getCoveragePercent = async (): Promise<number> => {
   return formattedPercent;
 };
 
-export const generateComment = (percent: number, summary: string): string =>
-  `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${getCoveragePercent()} %</code></p>
+export const generateComment = async (percent: number, summary: string): Promise<string> => {
+  const mainCoveragePercent = await getMainCoverageValue();
+  return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainCoveragePercent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
 
 </details>`;
+};
 
 const isPreviousTotalCoverageComment = comment => (
   comment.user &&
@@ -184,14 +185,14 @@ const mainCoverageCacheFile: CacheValue = {
   key: 'coverageStatusHistory'
 };
 export const getMainCoverageValue = async (): Promise<number> => {
-  core.debug('Restoriing cache');
+  debug('Restoriing cache');
   const cacheKey = await cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
-  core.debug(`cacheKey: ${cacheKey}`);
+  debug(`cacheKey: ${cacheKey}`);
   if (cacheKey) {
-    core.debug('File coverageStatusHistory.txt found');
+    debug('File coverageStatusHistory.txt found');
     const command = `tail -1 ./${mainCoverageCacheFile.paths[0]}`;
     const output = await execCommand(command);
-    core.debug(`tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
+    debug(`tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
     return 66;
   }
   return -1;
@@ -202,9 +203,9 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
     const data = `${new Date().toISOString} - ${coverage}`;
     const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
     const output = await execCommand(command);
-    core.debug(`setMainCoverageValue command output ${output}`);
+    debug(`setMainCoverageValue command output ${output}`);
     await cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
-  } catch (error) {
-    core.error(`File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${error}`);
+  } catch (errorMsg) {
+    error(`File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
   }
 };

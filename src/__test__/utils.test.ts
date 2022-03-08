@@ -1,4 +1,4 @@
-import { generateComment, generateJestCommand, getCoveragePercent, getIssueNumber, stringFormatter, summaryFormatter } from '../utils';
+import { generateComment, generateJestCommand, getCoveragePercent, getIssueNumber, getMainCoverageValue, stringFormatter, summaryFormatter } from '../utils';
 import { exec } from '@actions/exec';
 
 jest.mock('@actions/github', () => ({
@@ -100,13 +100,13 @@ describe('utils', () => {
   });
 
   describe('generateComment', () => {
-    test('should return a valid comment', () => {
+    test('should return a valid comment', async () => {
       const realSummary = summaryFormatter(validJestReportResponse);
 
-      const result = generateComment(30, realSummary);
+      const result = await generateComment(30, realSummary);
 
       const expected = [
-        '<p>Total Coverage: <code>30 %</code></p>',
+        '<p>Total Coverage: <code>30 %</code> vs main: <code>-1 %</code></p>',
         '<details><summary>Coverage report</summary>',
         '',
         'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
