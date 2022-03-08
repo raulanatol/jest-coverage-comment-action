@@ -135,7 +135,7 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
     }
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
     const formattedPercent = Number(parseFloat(percent).toFixed(2));
-    exports.setMainCoverageValue(formattedPercent);
+    yield exports.setMainCoverageValue(formattedPercent);
     return formattedPercent;
 });
 exports.getCoveragePercent = getCoveragePercent;
@@ -244,12 +244,12 @@ const mainCoverageCacheFile = {
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] getMainCoverageValue - Restoring cache');
     const cacheKey = yield cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
-    core_1.debug(` [action] cacheKey: ${cacheKey}`);
+    core_1.info(` [action] cacheKey: ${cacheKey}`);
     if (cacheKey) {
-        core_1.debug(' [action] File coverageStatusHistory.txt found');
+        core_1.info(' [action] File coverageStatusHistory.txt found');
         const command = `tail -1 ./${mainCoverageCacheFile.paths[0]}`;
         const output = yield exports.execCommand(command);
-        core_1.debug(` [action] tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
+        core_1.info(` [action] tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
         return 66;
     }
     return -1;
@@ -259,13 +259,13 @@ const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, fun
     try {
         const data = `${new Date().toISOString()} - ${coverage}`;
         const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
-        core_1.debug(`Command to be executed: ${command}`);
+        core_1.info(`Command to be executed: ${command}`);
         const output = yield exports.execCommand(command);
         core_1.info(` [action] setMainCoverageValue command output ${output}`);
         yield cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
     }
     catch (errorMsg) {
-        core_1.debug(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
+        core_1.info(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
         core_1.error(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
     }
 });

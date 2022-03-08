@@ -1,7 +1,7 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
 import * as cache from '@actions/cache';
-import { info, debug, error, getInput, warning } from '@actions/core';
+import { info, error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
@@ -52,7 +52,7 @@ export const getCoveragePercent = async (): Promise<number> => {
   const percent = await execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
   const formattedPercent = Number(parseFloat(percent).toFixed(2));
 
-  setMainCoverageValue(formattedPercent);
+  await setMainCoverageValue(formattedPercent);
 
   return formattedPercent;
 };
@@ -187,12 +187,12 @@ const mainCoverageCacheFile: CacheValue = {
 export const getMainCoverageValue = async (): Promise<number> => {
   info(' [action] getMainCoverageValue - Restoring cache');
   const cacheKey = await cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
-  debug(` [action] cacheKey: ${cacheKey}`);
+  info(` [action] cacheKey: ${cacheKey}`);
   if (cacheKey) {
-    debug(' [action] File coverageStatusHistory.txt found');
+    info(' [action] File coverageStatusHistory.txt found');
     const command = `tail -1 ./${mainCoverageCacheFile.paths[0]}`;
     const output = await execCommand(command);
-    debug(` [action] tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
+    info(` [action] tail ./${mainCoverageCacheFile.paths[0]} ${output}`);
     return 66;
   }
   return -1;
@@ -202,12 +202,12 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   try {
     const data = `${new Date().toISOString()} - ${coverage}`;
     const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
-    debug(`Command to be executed: ${command}`);
+    info(`Command to be executed: ${command}`);
     const output = await execCommand(command);
     info(` [action] setMainCoverageValue command output ${output}`);
     await cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
   } catch (errorMsg) {
-    debug(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
+    info(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
     error(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);
   }
 };
