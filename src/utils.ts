@@ -186,6 +186,7 @@ const mainCoverageCacheFile: CacheValue = {
 };
 export const getMainCoverageValue = async (): Promise<number> => {
   debug('Restoriing cache');
+  console.log('Restoring cache');
   const cacheKey = await cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
   debug(`cacheKey: ${cacheKey}`);
   if (cacheKey) {

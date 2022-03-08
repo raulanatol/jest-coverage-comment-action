@@ -243,6 +243,7 @@ const mainCoverageCacheFile = {
 };
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
     core_1.debug('Restoriing cache');
+    console.log('Restoring cache');
     const cacheKey = yield cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
     core_1.debug(`cacheKey: ${cacheKey}`);
     if (cacheKey) {
