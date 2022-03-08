@@ -1,7 +1,7 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
 import * as cache from '@actions/cache';
-import { debug, error, getInput, warning } from '@actions/core';
+import { info, debug, error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
@@ -185,7 +185,7 @@ const mainCoverageCacheFile: CacheValue = {
   key: 'coverageStatusHistory'
 };
 export const getMainCoverageValue = async (): Promise<number> => {
-  debug(' [action] getMainCoverageValue - Restoring cache');
+  info(' [action] getMainCoverageValue - Restoring cache');
   const cacheKey = await cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
   debug(` [action] cacheKey: ${cacheKey}`);
   if (cacheKey) {
@@ -200,10 +200,11 @@ export const getMainCoverageValue = async (): Promise<number> => {
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   try {
-    const data = `${new Date().toISOString} - ${coverage}`;
+    const data = `${new Date().toISOString()} - ${coverage}`;
     const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
+    debug(`Command to be executed: ${command}`);
     const output = await execCommand(command);
-    debug(` [action] setMainCoverageValue command output ${output}`);
+    info(` [action] setMainCoverageValue command output ${output}`);
     await cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
   } catch (errorMsg) {
     debug(` [action] File with coverage value ${mainCoverageCacheFile.paths[0]}, could not be saved:\n${errorMsg}`);

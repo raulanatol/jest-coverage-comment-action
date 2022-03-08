@@ -242,7 +242,7 @@ const mainCoverageCacheFile = {
     key: 'coverageStatusHistory'
 };
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
-    core_1.debug(' [action] getMainCoverageValue - Restoring cache');
+    core_1.info(' [action] getMainCoverageValue - Restoring cache');
     const cacheKey = yield cache.restoreCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
     core_1.debug(` [action] cacheKey: ${cacheKey}`);
     if (cacheKey) {
@@ -257,10 +257,11 @@ const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* (
 exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = `${new Date().toISOString} - ${coverage}`;
+        const data = `${new Date().toISOString()} - ${coverage}`;
         const command = `echo "${data}" >> ./${mainCoverageCacheFile.paths[0]}`;
+        core_1.debug(`Command to be executed: ${command}`);
         const output = yield exports.execCommand(command);
-        core_1.debug(` [action] setMainCoverageValue command output ${output}`);
+        core_1.info(` [action] setMainCoverageValue command output ${output}`);
         yield cache.saveCache(mainCoverageCacheFile.paths, mainCoverageCacheFile.key);
     }
     catch (errorMsg) {
