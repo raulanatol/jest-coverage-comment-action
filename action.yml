@@ -17,7 +17,7 @@ inputs:
     required: false
     default: 'true'
   working-directory:
-    description: 'Specify a directory where npm command has to be executed' (without trailing slash)
+    description: 'Specify a directory where npm command has to be executed'
     required: false
     default: ''
   delete-previous:
