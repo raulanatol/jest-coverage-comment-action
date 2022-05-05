@@ -43,7 +43,7 @@ export const execCommand = async (command: string, formatter = stringFormatter):
 export const existsCoverageReport = () => {
   const workingDir = getInput('working-directory');
   return fs.existsSync(`${workingDir ?? '.'}/coverage/lcov.info`);
-}
+};
 
 export const getCoveragePercent = async (): Promise<number> => {
   if (!existsCoverageReport()) {
