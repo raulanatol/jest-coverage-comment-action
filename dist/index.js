@@ -118,7 +118,10 @@ const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(
     }
 });
 exports.execCommand = execCommand;
-const existsCoverageReport = () => fs.existsSync('./coverage/lcov.info');
+const existsCoverageReport = () => {
+    const workingDir = core_1.getInput('working-directory');
+    return fs.existsSync(`${workingDir !== null && workingDir !== void 0 ? workingDir : '.'}/coverage/lcov.info`);
+};
 exports.existsCoverageReport = existsCoverageReport;
 const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!exports.existsCoverageReport()) {
