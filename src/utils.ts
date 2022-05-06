@@ -5,6 +5,7 @@ import { info, error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
+import { sendCoverage } from './networkUtils';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -202,23 +203,9 @@ export const getMainCoverageValue = async (): Promise<number> => {
 };
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
-  info(' [action] setMainCoverageValue - Setting cache');
+  info(' [action] setMainCoverageValue');
   try {
-
-    const command3 = `mkdir ${mainCoverageCache.paths[0]}`;
-    const output3 = await execCommand(command3);
-    info(` [action] ${command3} --> ${output3}`);
-
-    const data = `${new Date().toISOString()} - ${coverage}`;
-    const command = `echo "${data}" >> ./${mainCoverageCacheFile}`;
-    info(`Command to be executed: ${command}`);
-    const output = await execCommand(command);
-    info(` [action] ${command} --> ${output}`);
-
-    const command2 = `tail -1 ./${mainCoverageCacheFile}`;
-    const output2 = await execCommand(command2);
-    info(` [action] ${command2} --> ${output2}`);
-    await cache.saveCache(mainCoverageCache.paths, mainCoverageCache.key);
+    await sendCoverage('main', coverage);
   } catch (errorMsg) {
     info(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
     error(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
