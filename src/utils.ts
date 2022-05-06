@@ -1,6 +1,5 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
-import * as cache from '@actions/cache';
 import { info, error, getInput, warning } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
@@ -59,7 +58,7 @@ export const getCoveragePercent = async (): Promise<number> => {
 };
 
 export const generateComment = async (percent: number, summary: string): Promise<string> => {
-  const mainCoveragePercent = 55; //await getMainCoverageValue();
+  const mainCoveragePercent = await getMainCoverageValue();
   return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainCoveragePercent} %</code></p>
 <details><summary>Coverage report</summary>
 
@@ -177,29 +176,9 @@ export const generateJestCommand = () => {
   return `${baseCommand} ${changeSinceParam}`;
 };
 
-interface CacheValue {
-  paths: string[];
-  key: string;
-}
-const mainCoverageCache: CacheValue = {
-  paths: ['coverageStatusHistory'],
-  key: 'coverageStatusHistory2'
-};
-
-const mainCoverageCacheFile = './coverageStatusHistory/coverageMain.txt';
-
 export const getMainCoverageValue = async (): Promise<number> => {
-  info(' [action] getMainCoverageValue - Restoring cache');
-  const cacheKey = await cache.restoreCache(mainCoverageCache.paths, mainCoverageCache.key);
-  info(` [action] cacheKey: ${cacheKey}`);
-  if (cacheKey) {
-    info(' [action] Folder coverageStatusHistory found');
-    const command = `tail -1 ./${mainCoverageCacheFile}`;
-    const output = await execCommand(command);
-    info(` [action] ${command} --> ${output}`);
-    return 66;
-  }
-  return -1;
+  info(' [action] getMainCoverageValue');
+  return 66;
 };
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
@@ -207,7 +186,7 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   try {
     await sendCoverage('main', coverage);
   } catch (errorMsg) {
-    info(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
-    error(` [action] File with coverage value ${mainCoverageCache.paths[0]}, could not be saved:\n${errorMsg}`);
+    info(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
+    error(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
   }
 };
