@@ -28,6 +28,10 @@ inputs:
     description: 'Use existing coverage report fi exists, and do not run the tests'
     required: false
     default: 'false'
+  auth-token:
+    description: 'Use existing coverage report fi exists, and do not run the tests'
+    required: false
+    default: 'auth token'
 runs:
   using: 'node12'
   main: 'dist/index.js'
