@@ -1,5 +1,6 @@
 import { getInput, info, error } from '@actions/core';
 import { getInputValue } from './utils';
+import { fetch } from 'cross-fetch';
 
 const createHeaders = (): HeadersInit => {
   const headers: HeadersInit = {
