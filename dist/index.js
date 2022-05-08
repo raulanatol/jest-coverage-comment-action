@@ -79,14 +79,14 @@ const createHeaders = () => {
     }
     return headers;
 };
-const sendCoverage = (branch, percentage) => __awaiter(void 0, void 0, void 0, function* () {
+const sendCoverage = (repository, percentage) => __awaiter(void 0, void 0, void 0, function* () {
     const url = 'https://8c5b-81-61-118-50.eu.ngrok.io/v1/testing/report/coverage';
-    core_1.info(` [action] sendCoverage - Sending to url: ${url} for branch: ${branch} coverage percentage: ${percentage}`);
+    core_1.info(` [action] sendCoverage - Sending to url: ${url} for branch: ${repository} coverage percentage: ${percentage}`);
     const request = {
         method: 'POST',
         credentials: 'include',
         headers: createHeaders(),
-        body: JSON.stringify({ branch, percentage })
+        body: JSON.stringify({ repository, percentage })
     };
     const response = yield cross_fetch_1.fetch(url, request);
     core_1.info(` [action] sendCoverage - Response ${response.status}`);
@@ -295,7 +295,7 @@ exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] setMainCoverageValue');
     try {
-        yield networkUtils_1.sendCoverage('main', coverage);
+        yield networkUtils_1.sendCoverage('web', coverage);
     }
     catch (errorMsg) {
         core_1.info(` [action] File with coverage value , could not be saved:\n${errorMsg}`);

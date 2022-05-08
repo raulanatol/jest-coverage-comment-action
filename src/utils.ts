@@ -190,7 +190,7 @@ export const getMainCoverageValue = async (): Promise<number> => {
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   info(' [action] setMainCoverageValue');
   try {
-    await sendCoverage('main', coverage);
+    await sendCoverage('web', coverage);
   } catch (errorMsg) {
     info(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
     error(` [action] File with coverage value , could not be saved:\n${errorMsg}`);

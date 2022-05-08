@@ -19,14 +19,14 @@ const createHeaders = (): HeadersInit => {
   return headers;
 };
 
-export const sendCoverage = async (branch: string, percentage: number): Promise<void> => {
+export const sendCoverage = async (repository: string, percentage: number): Promise<void> => {
   const url: string = 'https://8c5b-81-61-118-50.eu.ngrok.io/v1/testing/report/coverage';
-  info(` [action] sendCoverage - Sending to url: ${url} for branch: ${branch} coverage percentage: ${percentage}`);
+  info(` [action] sendCoverage - Sending to url: ${url} for branch: ${repository} coverage percentage: ${percentage}`);
   const request: RequestInit = {
     method: 'POST',
     credentials: 'include',
     headers: createHeaders(),
-    body: JSON.stringify({ branch, percentage })
+    body: JSON.stringify({ repository, percentage })
   };
 
   const response = await fetch(url, request);
