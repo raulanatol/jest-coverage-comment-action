@@ -1,6 +1,6 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
-import { info, error, getInput, warning } from '@actions/core';
+import { info, error, getInput, warning, InputOptions } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
@@ -21,7 +21,7 @@ export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
   stringFormatter(input.slice(findTableStart('File', input), input.length - 1));
 
 export const execCommand = async (command: string, formatter = stringFormatter): Promise<string> => {
-  const workingDir = getInput('working-directory');
+  const workingDir = getInputValue('working-directory');
   const output: string[] = [];
   const options = {
     silent: true,
@@ -142,8 +142,14 @@ export const generateCoverageSummary = async (jestCommand: string): Promise<stri
   return await execCommand(command);
 };
 
+export const getInputValue = (name: string, options?: InputOptions): string => {
+  const value = getInput(name, options);
+  info(`Getting parameter ${name} with value ${value}`);
+  return value;
+};
+
 const getBooleanInput = (input: string): boolean | undefined => {
-  switch (getInput(input)) {
+  switch (getInputValue(input)) {
     case 'true':
       return true;
     case 'false':

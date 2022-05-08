@@ -1,15 +1,15 @@
 import { getInput, info, error } from '@actions/core';
-import 'cross-fetch/polyfill';
+import { getInputValue } from './utils';
 
 const createHeaders = (): HeadersInit => {
   const headers: HeadersInit = {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'scope': 'rentals'
+    'Content-Type': 'application/json'
   };
 
   const token = getInput('auth-token');
-  const headerParameter = getInput('auth-header-parameter') ?? 'bearer';
+  const headerParameter = getInputValue('auth-header-parameter') || 'bearer';
+
 
   if (token) {
     headers[headerParameter] = token;
@@ -19,7 +19,7 @@ const createHeaders = (): HeadersInit => {
 };
 
 export const sendCoverage = async (branch: string, percentage: number): Promise<void> => {
-  const url: string = 'https://0d30-81-61-118-50.eu.ngrok.io/v1/testing/report/coverage';
+  const url: string = 'https://8c5b-81-61-118-50.eu.ngrok.io/v1/testing/report/coverage';
   info(` [action] sendCoverage - Sending to url: ${url} for branch: ${branch} coverage percentage: ${percentage}`);
   const request: RequestInit = {
     method: 'POST',
