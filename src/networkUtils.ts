@@ -1,38 +1,46 @@
 import { info, error } from '@actions/core';
-import { getInputValue } from './utils';
 import { fetch } from 'cross-fetch';
 
-const createHeaders = (): HeadersInit => {
+export interface HederFieldValue {
+  field: string;
+  value: string;
+}
+
+const createHeaders = (headeAuthFieldValue?: HederFieldValue): HeadersInit => {
   const headers: HeadersInit = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   };
 
-  const token = getInputValue('auth-token');
-  const headerParameter = getInputValue('auth-header-parameter') || 'bearer';
-
-
-  if (token) {
-    headers[headerParameter] = token;
+  if (headeAuthFieldValue) {
+    headers[headeAuthFieldValue.field] = headeAuthFieldValue.value;
   }
 
   return headers;
 };
 
-export const sendCoverage = async (repository: string, percentage: number): Promise<void> => {
-  const url: string = 'https://8c5b-81-61-118-50.eu.ngrok.io/v1/testing/report/coverage';
-  info(` [action] sendCoverage - Sending to url: ${url} for branch: ${repository} coverage percentage: ${percentage}`);
+export const MethodTypeValues = <const>['GET', 'POST'];
+export type MethodType = typeof MethodTypeValues[number];
+
+export const sendRequest = async (methodType: MethodType, url: string, auth?: HederFieldValue, body?: any): Promise<any> => {
   const request: RequestInit = {
-    method: 'POST',
+    method: methodType,
     credentials: 'include',
-    headers: createHeaders(),
-    body: JSON.stringify({ repository, percentage })
+    headers: createHeaders(auth),
+    body: JSON.stringify(body)
   };
 
+  info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body: ${body}`);
   const response = await fetch(url, request);
-  info(` [action] sendCoverage - Response ${response.status}`);
+  info(` [action] sendRequest - Response ${response.status}`);
   if (response.status < 200 || response.status >= 300) {
-    error(` [action] sendCoverage - Not expected response ${response.status}`);
-    throw new Error(` [action] sendCoverage - Not expected response ${response.status}`);
+    error(` [action] sendRequest - Not expected response ${response.status}`);
+    throw new Error(` [action] sendRequest - Not expected response ${response.status}`);
   }
+
+  if (response.status === 204) {
+    return;
+  }
+
+  return response.json();
 };

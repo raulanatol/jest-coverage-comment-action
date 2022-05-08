@@ -28,10 +28,19 @@ inputs:
     description: 'Use existing coverage report fi exists, and do not run the tests'
     required: false
     default: 'false'
+  repository:
+    description: 'Repository key to set and fetch form server measure'
+    required: true
   auth-token:
     description: 'Use existing coverage report fi exists, and do not run the tests'
     required: false
-    default: 'auth token'
+  auth-header-parameter:
+    description: 'Header field for sending the auth-token'
+    required: false
+    default: 'bearer'
+  host-measures:
+    description: 'Host + endpoint to retreive (GET) and set (POST) measures. If unset, functionality is disabled'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

@@ -4,7 +4,8 @@ import { info, error, getInput, warning, InputOptions } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
-import { sendCoverage } from './networkUtils';
+import { Measure } from './measures/measures.type';
+import { getMeasures, sendMeasures } from './measures/measures';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -58,8 +59,8 @@ export const getCoveragePercent = async (): Promise<number> => {
 };
 
 export const generateComment = async (percent: number, summary: string): Promise<string> => {
-  const mainCoveragePercent = await getMainCoverageValue();
-  return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainCoveragePercent} %</code></p>
+  const mainMeasure = await getMainCoverageValue();
+  return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainMeasure.coverageMeasure.percentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -182,15 +183,15 @@ export const generateJestCommand = () => {
   return `${baseCommand} ${changeSinceParam}`;
 };
 
-export const getMainCoverageValue = async (): Promise<number> => {
+export const getMainCoverageValue = async (): Promise<Measure> => {
   info(' [action] getMainCoverageValue');
-  return 66;
+  return getMeasures(getInputValue('repository'));
 };
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   info(' [action] setMainCoverageValue');
   try {
-    await sendCoverage('web', coverage);
+    await sendMeasures(getInputValue('repository'), coverage);
   } catch (errorMsg) {
     info(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
     error(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
