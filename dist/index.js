@@ -72,7 +72,7 @@ const createHeaders = () => {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     };
-    const token = core_1.getInput('auth-token');
+    const token = utils_1.getInputValue('auth-token');
     const headerParameter = utils_1.getInputValue('auth-header-parameter') || 'bearer';
     if (token) {
         headers[headerParameter] = token;

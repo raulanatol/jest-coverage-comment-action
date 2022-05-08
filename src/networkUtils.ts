@@ -1,4 +1,4 @@
-import { getInput, info, error } from '@actions/core';
+import { info, error } from '@actions/core';
 import { getInputValue } from './utils';
 import { fetch } from 'cross-fetch';
 
@@ -8,7 +8,7 @@ const createHeaders = (): HeadersInit => {
     'Content-Type': 'application/json'
   };
 
-  const token = getInput('auth-token');
+  const token = getInputValue('auth-token');
   const headerParameter = getInputValue('auth-header-parameter') || 'bearer';
 
 
