@@ -31,7 +31,7 @@ export const sendCoverage = async (branch: string, percentage: number): Promise<
 
   const response = await fetch(url, request);
   info(` [action] sendCoverage - Response ${response.status}`);
-  if (response.status < 200 && response.status >= 300) {
+  if (response.status < 200 || response.status >= 300) {
     error(` [action] sendCoverage - Not expected response ${response.status}`);
     throw new Error(` [action] sendCoverage - Not expected response ${response.status}`);
   }

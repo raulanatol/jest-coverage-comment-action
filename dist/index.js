@@ -90,7 +90,7 @@ const sendCoverage = (branch, percentage) => __awaiter(void 0, void 0, void 0, f
     };
     const response = yield cross_fetch_1.fetch(url, request);
     core_1.info(` [action] sendCoverage - Response ${response.status}`);
-    if (response.status < 200 && response.status >= 300) {
+    if (response.status < 200 || response.status >= 300) {
         core_1.error(` [action] sendCoverage - Not expected response ${response.status}`);
         throw new Error(` [action] sendCoverage - Not expected response ${response.status}`);
     }
@@ -11474,7 +11474,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const action_1 = __nccwpck_require__(9139);
 action_1.start()
-    .then(() => core_1.info('Finished! V0.1.1.0'))
+    .then(() => core_1.info('Finished! V0.1.1.1'))
     .catch(error => core_1.setFailed(error.message));
 
 })();
