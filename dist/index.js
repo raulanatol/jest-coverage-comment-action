@@ -48,6 +48,62 @@ exports.getRestClient = getRestClient;
 
 /***/ }),
 
+/***/ 1373:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getMeasures = exports.sendMeasures = void 0;
+const core_1 = __nccwpck_require__(2186);
+const networkUtils_1 = __nccwpck_require__(3405);
+const utils_1 = __nccwpck_require__(918);
+const isSendingMeasuresEnable = () => {
+    const url = utils_1.getInputValue('host-measures');
+    return Boolean(url);
+};
+const getAuthHeader = () => {
+    const field = utils_1.getInputValue('auth-header-parameter');
+    const value = utils_1.getInputValue('auth-token');
+    if (field && value) {
+        return { field, value };
+    }
+    return undefined;
+};
+const sendMeasures = (repository, percentage) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!isSendingMeasuresEnable()) {
+        return;
+    }
+    const url = utils_1.getInputValue('host-measures');
+    core_1.info(` [action] sendMeasures - repository: ${repository} coverage percentage: ${percentage}`);
+    yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, percentage });
+});
+exports.sendMeasures = sendMeasures;
+const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!isSendingMeasuresEnable()) {
+        return {};
+    }
+    const url = utils_1.getInputValue('host-measures') + `?repository=${repository}`;
+    core_1.info(` [action] getMeasures - GET to url: ${url} for repository: ${repository}`);
+    const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader());
+    const measure = response;
+    core_1.info(` [action] getMeasures - Data:  ${measure}`);
+    return measure;
+});
+exports.getMeasures = getMeasures;
+
+
+/***/ }),
+
 /***/ 3405:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -63,39 +119,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sendCoverage = void 0;
+exports.sendRequest = exports.MethodTypeValues = void 0;
 const core_1 = __nccwpck_require__(2186);
-const utils_1 = __nccwpck_require__(918);
 const cross_fetch_1 = __nccwpck_require__(9805);
-const createHeaders = () => {
+const createHeaders = (headeAuthFieldValue) => {
     const headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
     };
-    const token = utils_1.getInputValue('auth-token');
-    const headerParameter = utils_1.getInputValue('auth-header-parameter') || 'bearer';
-    if (token) {
-        headers[headerParameter] = token;
+    if (headeAuthFieldValue) {
+        headers[headeAuthFieldValue.field] = headeAuthFieldValue.value;
     }
     return headers;
 };
-const sendCoverage = (repository, percentage) => __awaiter(void 0, void 0, void 0, function* () {
-    const url = 'https://8c5b-81-61-118-50.eu.ngrok.io/v1/testing/report/coverage';
-    core_1.info(` [action] sendCoverage - Sending to url: ${url} for branch: ${repository} coverage percentage: ${percentage}`);
+exports.MethodTypeValues = ['GET', 'POST'];
+const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, void 0, function* () {
     const request = {
-        method: 'POST',
+        method: methodType,
         credentials: 'include',
-        headers: createHeaders(),
-        body: JSON.stringify({ repository, percentage })
+        headers: createHeaders(auth),
+        body: JSON.stringify(body)
     };
+    core_1.info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body: ${body}`);
     const response = yield cross_fetch_1.fetch(url, request);
-    core_1.info(` [action] sendCoverage - Response ${response.status}`);
+    core_1.info(` [action] sendRequest - Response ${response.status}`);
     if (response.status < 200 || response.status >= 300) {
-        core_1.error(` [action] sendCoverage - Not expected response ${response.status}`);
-        throw new Error(` [action] sendCoverage - Not expected response ${response.status}`);
+        core_1.error(` [action] sendRequest - Not expected response ${response.status}`);
+        throw new Error(` [action] sendRequest - Not expected response ${response.status}`);
     }
+    if (response.status === 204) {
+        return;
+    }
+    return response.json();
 });
-exports.sendCoverage = sendCoverage;
+exports.sendRequest = sendRequest;
 
 
 /***/ }),
@@ -140,7 +197,7 @@ const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
 const gitHubAPI_1 = __nccwpck_require__(7675);
 const fs = __importStar(__nccwpck_require__(5747));
-const networkUtils_1 = __nccwpck_require__(3405);
+const measures_1 = __nccwpck_require__(1373);
 const findTableStart = (search, array) => {
     const index = array.findIndex((line) => line.startsWith(search), search);
     return (index > 0 ? index : 1);
@@ -184,8 +241,8 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.getCoveragePercent = getCoveragePercent;
 const generateComment = (percent, summary) => __awaiter(void 0, void 0, void 0, function* () {
-    const mainCoveragePercent = yield exports.getMainCoverageValue();
-    return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainCoveragePercent} %</code></p>
+    const mainMeasure = yield exports.getMainCoverageValue();
+    return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainMeasure.coverageMeasure.percentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -289,13 +346,13 @@ const generateJestCommand = () => {
 exports.generateJestCommand = generateJestCommand;
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] getMainCoverageValue');
-    return 66;
+    return measures_1.getMeasures(exports.getInputValue('repository'));
 });
 exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] setMainCoverageValue');
     try {
-        yield networkUtils_1.sendCoverage('web', coverage);
+        yield measures_1.sendMeasures(exports.getInputValue('repository'), coverage);
     }
     catch (errorMsg) {
         core_1.info(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
@@ -11474,7 +11531,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const action_1 = __nccwpck_require__(9139);
 action_1.start()
-    .then(() => core_1.info('Finished! V0.1.1.1'))
+    .then(() => core_1.info('Finished! V0.1.1.2'))
     .catch(error => core_1.setFailed(error.message));
 
 })();
