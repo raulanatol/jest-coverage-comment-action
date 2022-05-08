@@ -1,4 +1,5 @@
 import { getInput, info, error } from '@actions/core';
+import 'cross-fetch/polyfill';
 
 const createHeaders = (): HeadersInit => {
   const headers: HeadersInit = {
