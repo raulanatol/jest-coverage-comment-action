@@ -21,7 +21,7 @@ const getAuthHeader = (): HederFieldValue | undefined => {
 };
 
 
-export const sendMeasures = async (repository: string, percentage: number): Promise<void> => {
+export const sendMeasures = async (repository: string, coveragePercentage: number): Promise<void> => {
   if (!isSendingMeasuresEnable()) {
     info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
     return;
@@ -29,8 +29,8 @@ export const sendMeasures = async (repository: string, percentage: number): Prom
 
   const url: string = getInputValue('host-measures');
 
-  info(` [action] sendMeasures - repository: ${repository} coverage percentage: ${percentage}`);
-  await sendRequest('POST', url, getAuthHeader(), { repository, percentage });
+  info(` [action] sendMeasures - repository: ${repository} coverage percentage: ${coveragePercentage}`);
+  await sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage });
 };
 
 export const getMeasures = async (repository: string): Promise<Measure> => {
