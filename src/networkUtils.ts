@@ -42,6 +42,5 @@ export const sendRequest = async (methodType: MethodType, url: string, auth?: He
     return;
   }
 
-  info(await response.text());
   return response.json();
 };

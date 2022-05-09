@@ -97,8 +97,8 @@ const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* 
     const url = utils_1.getInputValue('host-measures') + `?repository=${repository}`;
     core_1.info(` [action] getMeasures - GET to url: ${url} for repository: ${repository}`);
     const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader());
-    const measure = JSON.parse(response);
-    core_1.info(` [action] getMeasures - Data:  ${measure}`);
+    core_1.info(` [action] getMeasures - Data: ${JSON.stringify(response)}`);
+    const measure = response;
     return measure;
 });
 exports.getMeasures = getMeasures;
@@ -152,7 +152,6 @@ const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, v
     if (response.status === 204) {
         return;
     }
-    core_1.info(yield response.text());
     return response.json();
 });
 exports.sendRequest = sendRequest;
