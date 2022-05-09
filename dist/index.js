@@ -79,14 +79,14 @@ const getAuthHeader = () => {
     }
     return undefined;
 };
-const sendMeasures = (repository, percentage) => __awaiter(void 0, void 0, void 0, function* () {
+const sendMeasures = (repository, coveragePercentage) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isSendingMeasuresEnable()) {
         core_1.info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
         return;
     }
     const url = utils_1.getInputValue('host-measures');
-    core_1.info(` [action] sendMeasures - repository: ${repository} coverage percentage: ${percentage}`);
-    yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, percentage });
+    core_1.info(` [action] sendMeasures - repository: ${repository} coverage percentage: ${coveragePercentage}`);
+    yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage });
 });
 exports.sendMeasures = sendMeasures;
 const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
