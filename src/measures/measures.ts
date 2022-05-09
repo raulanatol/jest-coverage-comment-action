@@ -44,7 +44,7 @@ export const getMeasures = async (repository: string): Promise<Measure> => {
   info(` [action] getMeasures - GET to url: ${url} for repository: ${repository}`);
   const response = await sendRequest('GET', url, getAuthHeader());
 
-  const measure: Measure = response as any as Measure;
+  const measure: Measure = JSON.parse(response) as any as Measure;
   info(` [action] getMeasures - Data:  ${measure}`);
 
   return measure;

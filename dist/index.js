@@ -97,7 +97,7 @@ const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* 
     const url = utils_1.getInputValue('host-measures') + `?repository=${repository}`;
     core_1.info(` [action] getMeasures - GET to url: ${url} for repository: ${repository}`);
     const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader());
-    const measure = response;
+    const measure = JSON.parse(response);
     core_1.info(` [action] getMeasures - Data:  ${measure}`);
     return measure;
 });
@@ -142,7 +142,7 @@ const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, v
         headers: createHeaders(auth),
         body: JSON.stringify(body)
     };
-    core_1.info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body: ${body}`);
+    core_1.info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body:\n ${JSON.stringify(body)}`);
     const response = yield cross_fetch_1.fetch(url, request);
     core_1.info(` [action] sendRequest - Response ${response.status}`);
     if (response.status < 200 || response.status >= 300) {
@@ -152,6 +152,7 @@ const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, v
     if (response.status === 204) {
         return;
     }
+    core_1.info(yield response.text());
     return response.json();
 });
 exports.sendRequest = sendRequest;
@@ -348,7 +349,7 @@ const generateJestCommand = () => {
 exports.generateJestCommand = generateJestCommand;
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] getMainCoverageValue');
-    return measures_1.getMeasures(exports.getInputValue('repository'));
+    return yield measures_1.getMeasures(exports.getInputValue('repository'));
 });
 exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {

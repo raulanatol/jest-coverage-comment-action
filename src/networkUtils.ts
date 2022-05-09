@@ -30,7 +30,7 @@ export const sendRequest = async (methodType: MethodType, url: string, auth?: He
     body: JSON.stringify(body)
   };
 
-  info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body: ${body}`);
+  info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body:\n ${JSON.stringify(body)}`);
   const response = await fetch(url, request);
   info(` [action] sendRequest - Response ${response.status}`);
   if (response.status < 200 || response.status >= 300) {
@@ -42,5 +42,6 @@ export const sendRequest = async (methodType: MethodType, url: string, auth?: He
     return;
   }
 
+  info(await response.text());
   return response.json();
 };

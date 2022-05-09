@@ -185,7 +185,7 @@ export const generateJestCommand = () => {
 
 export const getMainCoverageValue = async (): Promise<Measure> => {
   info(' [action] getMainCoverageValue');
-  return getMeasures(getInputValue('repository'));
+  return await getMeasures(getInputValue('repository'));
 };
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
