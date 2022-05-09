@@ -23,6 +23,7 @@ const getAuthHeader = (): HederFieldValue | undefined => {
 
 export const sendMeasures = async (repository: string, percentage: number): Promise<void> => {
   if (!isSendingMeasuresEnable()) {
+    info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
     return;
   }
 
@@ -34,6 +35,7 @@ export const sendMeasures = async (repository: string, percentage: number): Prom
 
 export const getMeasures = async (repository: string): Promise<Measure> => {
   if (!isSendingMeasuresEnable()) {
+    info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
     return {} as any as Measure;
   }
 

@@ -81,6 +81,7 @@ const getAuthHeader = () => {
 };
 const sendMeasures = (repository, percentage) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isSendingMeasuresEnable()) {
+        core_1.info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
         return;
     }
     const url = utils_1.getInputValue('host-measures');
@@ -90,6 +91,7 @@ const sendMeasures = (repository, percentage) => __awaiter(void 0, void 0, void 
 exports.sendMeasures = sendMeasures;
 const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isSendingMeasuresEnable()) {
+        core_1.info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
         return {};
     }
     const url = utils_1.getInputValue('host-measures') + `?repository=${repository}`;
@@ -11531,7 +11533,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const action_1 = __nccwpck_require__(9139);
 action_1.start()
-    .then(() => core_1.info('Finished! V0.1.1.2'))
+    .then(() => core_1.info('Finished! V0.1.1.3'))
     .catch(error => core_1.setFailed(error.message));
 
 })();
