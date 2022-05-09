@@ -42,5 +42,5 @@ export const sendRequest = async (methodType: MethodType, url: string, auth?: He
     return;
   }
 
-  return response.json();
+  return await response.json();
 };

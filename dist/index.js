@@ -152,7 +152,7 @@ const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, v
     if (response.status === 204) {
         return;
     }
-    return response.json();
+    return yield response.json();
 });
 exports.sendRequest = sendRequest;
 
