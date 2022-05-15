@@ -121,9 +121,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sendRequest = exports.MethodTypeValues = void 0;
+exports.sendRequest = exports.sendRequest3 = exports.MethodTypeValues = void 0;
 const core_1 = __nccwpck_require__(2186);
+const http_client_1 = __nccwpck_require__(9925);
 const cross_fetch_1 = __nccwpck_require__(9805);
+const createHeaders3 = (headeAuthFieldValue) => {
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    };
+    if (headeAuthFieldValue) {
+        headers[headeAuthFieldValue.field] = headeAuthFieldValue.value;
+    }
+    return headers;
+};
 const createHeaders = (headeAuthFieldValue) => {
     const headers = {
         'Accept': 'application/json',
@@ -135,11 +146,11 @@ const createHeaders = (headeAuthFieldValue) => {
     return headers;
 };
 exports.MethodTypeValues = ['GET', 'POST'];
-const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, void 0, function* () {
+const sendRequest3 = (methodType, url, auth, body) => __awaiter(void 0, void 0, void 0, function* () {
     const request = {
         method: methodType,
         credentials: 'include',
-        headers: createHeaders(auth),
+        headers: createHeaders3(auth),
         body: JSON.stringify(body)
     };
     core_1.info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body:\n ${JSON.stringify(body)}`);
@@ -153,6 +164,35 @@ const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, v
         return;
     }
     return yield response.json();
+});
+exports.sendRequest3 = sendRequest3;
+const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, void 0, function* () {
+    const httpClient = new http_client_1.HttpClient();
+    core_1.info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body:\n ${JSON.stringify(body)}`);
+    let response;
+    if (methodType === 'GET') {
+        response = yield httpClient.get(url, createHeaders(auth));
+    }
+    else {
+        response = yield httpClient.post(url, body, createHeaders(auth));
+    }
+    const statusCode = response.message.statusCode;
+    if (!statusCode) {
+        const message = ' [action] sendRequest - Response not received';
+        core_1.error(message);
+        throw new Error(message);
+    }
+    core_1.info(` [action] sendRequest - Response ${statusCode}`);
+    if (statusCode < 200 || statusCode >= 300) {
+        const message = ` [action] sendRequest - Not expected response ${statusCode}`;
+        core_1.error(message);
+        throw new Error(message);
+    }
+    if (statusCode === 204) {
+        return;
+    }
+    const rawBodyResponse = yield response.readBody();
+    return JSON.parse(rawBodyResponse);
 });
 exports.sendRequest = sendRequest;
 
@@ -357,8 +397,7 @@ const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, fun
         yield measures_1.sendMeasures(exports.getInputValue('repository'), coverage);
     }
     catch (errorMsg) {
-        core_1.info(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
-        core_1.error(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
+        core_1.error(` [action] Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
     }
 });
 exports.setMainCoverageValue = setMainCoverageValue;

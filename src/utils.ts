@@ -193,7 +193,6 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   try {
     await sendMeasures(getInputValue('repository'), coverage);
   } catch (errorMsg) {
-    info(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
-    error(` [action] File with coverage value , could not be saved:\n${errorMsg}`);
+    error(` [action] Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
   }
 };
