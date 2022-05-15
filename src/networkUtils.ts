@@ -24,8 +24,7 @@ const createHeaders3 = (headeAuthFieldValue?: HederFieldValue): HeadersInit => {
 const createHeaders = (headeAuthFieldValue?: HederFieldValue): IHeaders => {
   const headers: HeadersInit = {
     'Accept': 'application/json',
-    'Content-Type': 'application/json',
-    'Origin': 'http://localhost:3000'
+    'Content-Type': 'application/json'
   };
 
   if (headeAuthFieldValue) {
@@ -62,7 +61,7 @@ export const sendRequest3 = async (methodType: MethodType, url: string, auth?: H
 };
 
 export const sendRequest = async (methodType: MethodType, url: string, auth?: HederFieldValue, body?: any): Promise<any> => {
-  const httpClient: HttpClient = new HttpClient();
+  const httpClient: HttpClient = new HttpClient('jest-coverage-action');
   info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body:\n ${JSON.stringify(body)}`);
   let response: IHttpClientResponse;
   if (methodType === 'GET') {

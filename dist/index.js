@@ -138,8 +138,7 @@ const createHeaders3 = (headeAuthFieldValue) => {
 const createHeaders = (headeAuthFieldValue) => {
     const headers = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Origin': 'http://localhost:3000'
+        'Content-Type': 'application/json'
     };
     if (headeAuthFieldValue) {
         headers[headeAuthFieldValue.field] = headeAuthFieldValue.value;
@@ -168,7 +167,7 @@ const sendRequest3 = (methodType, url, auth, body) => __awaiter(void 0, void 0, 
 });
 exports.sendRequest3 = sendRequest3;
 const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, void 0, function* () {
-    const httpClient = new http_client_1.HttpClient();
+    const httpClient = new http_client_1.HttpClient('jest-coverage-action');
     core_1.info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body:\n ${JSON.stringify(body)}`);
     let response;
     if (methodType === 'GET') {
