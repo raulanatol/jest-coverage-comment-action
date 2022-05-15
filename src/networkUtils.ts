@@ -71,6 +71,7 @@ export const sendRequest = async (methodType: MethodType, url: string, auth?: He
     response = await httpClient.post(url, body, createHeaders(auth));
   }
 
+  info(` [action] Response: ${JSON.stringify(response)}`);
   const statusCode = response.message.statusCode;
   if (!statusCode) {
     const message = ' [action] sendRequest - Response not received';

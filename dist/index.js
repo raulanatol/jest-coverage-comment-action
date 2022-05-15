@@ -177,6 +177,7 @@ const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, v
     else {
         response = yield httpClient.post(url, body, createHeaders(auth));
     }
+    core_1.info(` [action] Response: ${JSON.stringify(response)}`);
     const statusCode = response.message.statusCode;
     if (!statusCode) {
         const message = ' [action] sendRequest - Response not received';
