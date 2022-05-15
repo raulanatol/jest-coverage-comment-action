@@ -138,7 +138,8 @@ const createHeaders3 = (headeAuthFieldValue) => {
 const createHeaders = (headeAuthFieldValue) => {
     const headers = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Origin': 'http://localhost:3000'
     };
     if (headeAuthFieldValue) {
         headers[headeAuthFieldValue.field] = headeAuthFieldValue.value;
