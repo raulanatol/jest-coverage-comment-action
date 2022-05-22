@@ -203,7 +203,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setMainCoverageValue = exports.getMainCoverageValue = exports.generateJestCommand = exports.getInputValue = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.existsCoverageReport = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
+exports.setMainCoverageValue = exports.getMainCoverageValue = exports.generateJestCommand = exports.getInputValue = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateCompareComment = exports.generateComment = exports.getCoveragePercent = exports.existsCoverageReport = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
@@ -252,9 +252,15 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
     return formattedPercent;
 });
 exports.getCoveragePercent = getCoveragePercent;
+const roundPercentage = (percentage) => {
+    return Math.round((percentage + Number.EPSILON) * 100) / 100;
+};
 const generateComment = (percent, summary) => __awaiter(void 0, void 0, void 0, function* () {
     const mainMeasure = yield exports.getMainCoverageValue();
-    return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainMeasure.coverageMeasure.percentage} %</code></p>
+    if (mainMeasure) {
+        return exports.generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
+    }
+    return `<p>Total Coverage: <code>${percent}</p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -262,6 +268,25 @@ ${summary}
 </details>`;
 });
 exports.generateComment = generateComment;
+const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(void 0, void 0, void 0, function* () {
+    let difference;
+    if (percent > mainPercentage) {
+        difference = `green" + ${roundPercentage(percent - mainPercentage)}`;
+    }
+    else if (mainPercentage > percent) {
+        difference = `red " - ${roundPercentage(percent - mainPercentage)}`;
+    }
+    else {
+        difference = 'blue " 0.00';
+    }
+    return `<p>Total Coverage: <code>${percent} % (<span style="color:${difference} </span>)</code> vs main: <code>${mainPercentage} %</code></p>
+<details><summary>Coverage report</summary>
+
+${summary}
+
+</details>`;
+});
+exports.generateCompareComment = generateCompareComment;
 const isPreviousTotalCoverageComment = comment => (comment.user &&
     comment.body &&
     comment.user.login === 'github-actions[bot]' &&
@@ -363,6 +388,17 @@ const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* (
 exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] setMainCoverageValue');
+    try {
+        const command = 'echo ${GITHUB_REF#refs/heads/}';
+        const branch = yield exports.execCommand(command);
+        core_1.info(` [action] Current branch is ${branch}`);
+        if (branch !== 'main') {
+            return;
+        }
+    }
+    catch (errorMsg) {
+        core_1.error(` [action] Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
+    }
     try {
         yield measures_1.sendMeasures(exports.getInputValue('repository'), coverage);
     }
