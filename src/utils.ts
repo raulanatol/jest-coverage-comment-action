@@ -216,6 +216,18 @@ export const getMainCoverageValue = async (): Promise<Measure> => {
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   info(' [action] setMainCoverageValue');
+
+  try {
+    const command = 'echo ${GITHUB_REF#refs/heads/}';
+    const branch = await execCommand(command);
+    info(` [action] Current branch is ${branch}`);
+    if (branch !== 'main') {
+      return;
+    }
+  } catch (errorMsg) {
+    error(` [action] Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
+  }
+
   try {
     await sendMeasures(getInputValue('repository'), coverage);
   } catch (errorMsg) {
