@@ -218,8 +218,7 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   info(' [action] setMainCoverageValue');
 
   try {
-    const command = 'echo ${GITHUB_REF}';
-    const branch = await execCommand(command);
+    const branch = context.ref;
     info(` [action] Current branch is ${branch}`);
     if (branch !== 'main') {
       return;

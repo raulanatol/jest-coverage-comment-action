@@ -389,8 +389,7 @@ exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] setMainCoverageValue');
     try {
-        const command = 'echo ${GITHUB_REF}';
-        const branch = yield exports.execCommand(command);
+        const branch = github_1.context.ref;
         core_1.info(` [action] Current branch is ${branch}`);
         if (branch !== 'main') {
             return;
