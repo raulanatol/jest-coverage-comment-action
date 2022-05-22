@@ -58,9 +58,35 @@ export const getCoveragePercent = async (): Promise<number> => {
   return formattedPercent;
 };
 
+const roundPercentage = (percentage: number): number => {
+  return Math.round((percentage + Number.EPSILON) * 100) / 100;
+};
+
 export const generateComment = async (percent: number, summary: string): Promise<string> => {
   const mainMeasure = await getMainCoverageValue();
-  return `<p>Total Coverage: <code>${percent} %</code> vs main: <code>${mainMeasure.coverageMeasure.percentage} %</code></p>
+  if (mainMeasure) {
+    return generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
+  }
+
+  return `<p>Total Coverage: <code>${percent}</p>
+<details><summary>Coverage report</summary>
+
+${summary}
+
+</details>`;
+};
+
+export const generateCompareComment = async (percent: number, mainPercentage: number, summary: string): Promise<string> => {
+  let difference: string;
+  if (percent > mainPercentage) {
+    difference = `green" + ${roundPercentage(percent - mainPercentage)}`;
+  } else if (mainPercentage > percent) {
+    difference = `red " - ${roundPercentage(percent - mainPercentage)}`;
+  } else {
+    difference = 'blue " 0.00';
+  }
+
+  return `<p>Total Coverage: <code>${percent} % (<span style="color:${difference} </span>)</code> vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
