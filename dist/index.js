@@ -276,7 +276,7 @@ const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(v
     }
     else if (percent < mainPercentage) {
         difference = `- ${roundPercentage(percent - mainPercentage)}`;
-        icon = ':red_circle:';
+        icon = ':yellow_circle:';
     }
     else {
         difference = ' 0.00';

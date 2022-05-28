@@ -83,7 +83,7 @@ export const generateCompareComment = async (percent: number, mainPercentage: nu
     difference = `+ ${roundPercentage(percent - mainPercentage)}`;
   } else if (percent < mainPercentage) {
     difference = `- ${roundPercentage(percent - mainPercentage)}`;
-    icon = ':red_circle:';
+    icon = ':yellow_circle:';
   } else {
     difference = ' 0.00';
   }
