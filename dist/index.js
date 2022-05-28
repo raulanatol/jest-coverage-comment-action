@@ -17,10 +17,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.start = void 0;
-const core_1 = __nccwpck_require__(2186);
 const utils_1 = __nccwpck_require__(918);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
-    core_1.info(yield utils_1.execCommand('printenv GITHUB_HEAD_REF'));
     const jestCommand = utils_1.generateJestCommand();
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
     const percent = yield utils_1.getCoveragePercent();
@@ -273,15 +271,15 @@ exports.generateComment = generateComment;
 const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(void 0, void 0, void 0, function* () {
     let difference;
     if (percent > mainPercentage) {
-        difference = `${roundPercentage(percent - mainPercentage)}`;
+        difference = `+ :+1: :sparkles: :red_circle: ${roundPercentage(percent - mainPercentage)}`;
     }
     else if (percent < mainPercentage) {
-        difference = `red"> - ${roundPercentage(percent - mainPercentage)}`;
+        difference = `- ${roundPercentage(percent - mainPercentage)}`;
     }
     else {
-        difference = 'blue"> 0.00';
+        difference = ' 0.00';
     }
-    return `<p>Total Coverage: <code>${percent} %</code> (<span style="color:green;font-weight:bold">${difference}</span>) vs main: <code>${mainPercentage} %</code></p>
+    return `<p>Total Coverage: <code>${percent} %</code> (${difference}) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -391,8 +389,8 @@ exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] setMainCoverageValue');
     try {
-        const branch = JSON.stringify(github_1.context.ref);
-        core_1.info(` [action] Current branch AAAAAAAAAAAAA is ${branch}`);
+        const branch = yield exports.execCommand('printenv GITHUB_HEAD_REF');
+        core_1.info(` [action] Current branch is ${branch}`);
         if (branch !== 'main') {
             return;
         }

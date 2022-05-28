@@ -79,14 +79,14 @@ ${summary}
 export const generateCompareComment = async (percent: number, mainPercentage: number, summary: string): Promise<string> => {
   let difference: string;
   if (percent > mainPercentage) {
-    difference = `${roundPercentage(percent - mainPercentage)}`;
+    difference = `+ :+1: :sparkles: :red_circle: ${roundPercentage(percent - mainPercentage)}`;
   } else if (percent < mainPercentage) {
-    difference = `red"> - ${roundPercentage(percent - mainPercentage)}`;
+    difference = `- ${roundPercentage(percent - mainPercentage)}`;
   } else {
-    difference = 'blue"> 0.00';
+    difference = ' 0.00';
   }
 
-  return `<p>Total Coverage: <code>${percent} %</code> (<span style="color:green;font-weight:bold">${difference}</span>) vs main: <code>${mainPercentage} %</code></p>
+  return `<p>Total Coverage: <code>${percent} %</code> (${difference}) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -218,8 +218,8 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   info(' [action] setMainCoverageValue');
 
   try {
-    const branch = JSON.stringify(context.ref);
-    info(` [action] Current branch AAAAAAAAAAAAA is ${branch}`);
+    const branch = await execCommand('printenv GITHUB_HEAD_REF');
+    info(` [action] Current branch is ${branch}`);
     if (branch !== 'main') {
       return;
     }
