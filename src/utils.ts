@@ -79,14 +79,14 @@ ${summary}
 export const generateCompareComment = async (percent: number, mainPercentage: number, summary: string): Promise<string> => {
   let difference: string;
   if (percent > mainPercentage) {
-    difference = `green"> + ${roundPercentage(percent - mainPercentage)}`;
+    difference = `${roundPercentage(percent - mainPercentage)}`;
   } else if (percent < mainPercentage) {
     difference = `red"> - ${roundPercentage(percent - mainPercentage)}`;
   } else {
     difference = 'blue"> 0.00';
   }
 
-  return `<p>Total Coverage: <code>${percent} % (<span style="color:${difference} </span>)</code> vs main: <code>${mainPercentage} %</code></p>
+  return `<p>Total Coverage: <code>${percent} %</code> (<span style="color:green;font-weight:bold">${difference}</span>) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}

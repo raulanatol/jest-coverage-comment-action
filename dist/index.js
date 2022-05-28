@@ -20,7 +20,7 @@ exports.start = void 0;
 const core_1 = __nccwpck_require__(2186);
 const utils_1 = __nccwpck_require__(918);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
-    core_1.info(yield utils_1.execCommand('echo $GITHUB_HEAD_REF'));
+    core_1.info(yield utils_1.execCommand('printenv GITHUB_HEAD_REF'));
     const jestCommand = utils_1.generateJestCommand();
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
     const percent = yield utils_1.getCoveragePercent();
@@ -273,7 +273,7 @@ exports.generateComment = generateComment;
 const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(void 0, void 0, void 0, function* () {
     let difference;
     if (percent > mainPercentage) {
-        difference = `green"> + ${roundPercentage(percent - mainPercentage)}`;
+        difference = `${roundPercentage(percent - mainPercentage)}`;
     }
     else if (percent < mainPercentage) {
         difference = `red"> - ${roundPercentage(percent - mainPercentage)}`;
@@ -281,7 +281,7 @@ const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(v
     else {
         difference = 'blue"> 0.00';
     }
-    return `<p>Total Coverage: <code>${percent} % (<span style="color:${difference} </span>)</code> vs main: <code>${mainPercentage} %</code></p>
+    return `<p>Total Coverage: <code>${percent} %</code> (<span style="color:green;font-weight:bold">${difference}</span>) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
