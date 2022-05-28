@@ -281,7 +281,7 @@ const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(v
     else {
         difference = ' 0.00';
     }
-    return `${icon} <p>Total Coverage: <code>${percent} %</code> (${difference}) vs main: <code>${mainPercentage} %</code></p>
+    return `<p>${icon} Total Coverage: <code>${percent} %</code> (${difference}) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}

@@ -88,7 +88,7 @@ export const generateCompareComment = async (percent: number, mainPercentage: nu
     difference = ' 0.00';
   }
 
-  return `${icon} <p>Total Coverage: <code>${percent} %</code> (${difference}) vs main: <code>${mainPercentage} %</code></p>
+  return `<p>${icon} Total Coverage: <code>${percent} %</code> (${difference}) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
