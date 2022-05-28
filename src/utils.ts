@@ -79,11 +79,11 @@ ${summary}
 export const generateCompareComment = async (percent: number, mainPercentage: number, summary: string): Promise<string> => {
   let difference: string;
   if (percent > mainPercentage) {
-    difference = `green" + ${roundPercentage(percent - mainPercentage)}`;
-  } else if (mainPercentage > percent) {
-    difference = `red " - ${roundPercentage(percent - mainPercentage)}`;
+    difference = `green"> + ${roundPercentage(percent - mainPercentage)}`;
+  } else if (percent < mainPercentage) {
+    difference = `red"> - ${roundPercentage(percent - mainPercentage)}`;
   } else {
-    difference = 'blue " 0.00';
+    difference = 'blue"> 0.00';
   }
 
   return `<p>Total Coverage: <code>${percent} % (<span style="color:${difference} </span>)</code> vs main: <code>${mainPercentage} %</code></p>
@@ -218,7 +218,7 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   info(' [action] setMainCoverageValue');
 
   try {
-    const branch = JSON.stringify(context.payload);
+    const branch = JSON.stringify(context.ref);
     info(` [action] Current branch AAAAAAAAAAAAA is ${branch}`);
     if (branch !== 'main') {
       return;
