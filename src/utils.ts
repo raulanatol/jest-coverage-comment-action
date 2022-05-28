@@ -82,13 +82,13 @@ export const generateCompareComment = async (percent: number, mainPercentage: nu
   if (percent > mainPercentage) {
     difference = `+ ${roundPercentage(percent - mainPercentage)}`;
   } else if (percent < mainPercentage) {
-    difference = `- ${roundPercentage(percent - mainPercentage)}`;
+    difference = `<strong>- ${roundPercentage(percent - mainPercentage)}</strong>`;
     icon = ':yellow_circle:';
   } else {
     difference = ' 0.00';
   }
 
-  return `<p>${icon} Total Coverage: <code>${percent} %</code> (${difference}) vs main: <code>${mainPercentage} %</code></p>
+  return `<p>${icon} Total Coverage: <code>${percent} %</code> (<code>${difference}</code>) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
