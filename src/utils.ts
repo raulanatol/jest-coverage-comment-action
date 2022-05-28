@@ -218,8 +218,8 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   info(' [action] setMainCoverageValue');
 
   try {
-    const branch = context.ref;
-    info(` [action] Current branch is ${branch}`);
+    const branch = JSON.stringify(context.payload);
+    info(` [action] Current branch AAAAAAAAAAAAA is ${branch}`);
     if (branch !== 'main') {
       return;
     }

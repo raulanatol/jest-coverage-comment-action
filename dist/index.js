@@ -17,8 +17,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.start = void 0;
+const core_1 = __nccwpck_require__(2186);
 const utils_1 = __nccwpck_require__(918);
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield core_1.info(yield utils_1.execCommand('printenv'));
     const jestCommand = utils_1.generateJestCommand();
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
     const percent = yield utils_1.getCoveragePercent();
@@ -389,8 +391,8 @@ exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
     core_1.info(' [action] setMainCoverageValue');
     try {
-        const branch = github_1.context.ref;
-        core_1.info(` [action] Current branch is ${branch}`);
+        const branch = JSON.stringify(github_1.context.payload);
+        core_1.info(` [action] Current branch AAAAAAAAAAAAA is ${branch}`);
         if (branch !== 'main') {
             return;
         }
@@ -7665,7 +7667,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const action_1 = __nccwpck_require__(9139);
 action_1.start()
-    .then(() => core_1.info('Finished! V0.1.1.3'))
+    .then(() => core_1.info('Finished! V0.1.1.3.4'))
     .catch(error => core_1.setFailed(error.message));
 
 })();
