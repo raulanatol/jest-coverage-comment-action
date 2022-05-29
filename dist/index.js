@@ -63,7 +63,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateCompareComment = exports.getMainCoverageValue = exports.setMainCoverageValue = exports.isSendingMeasuresEnable = void 0;
+exports.generateCompareComment = exports.getMainCoverageValue = exports.setMainCoverageValue = void 0;
 const core_1 = __nccwpck_require__(2186);
 const networkUtils_1 = __nccwpck_require__(3405);
 const utils_1 = __nccwpck_require__(918);
@@ -75,7 +75,6 @@ const isSendingMeasuresEnable = () => {
     }
     return enabled;
 };
-exports.isSendingMeasuresEnable = isSendingMeasuresEnable;
 const getAuthHeader = () => {
     const field = utils_1.getInputValue('measures-server-auth-header-parameter');
     const value = utils_1.getInputValue('measures-server-auth-token');
@@ -101,8 +100,11 @@ const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* 
     const measure = response;
     return measure;
 });
+const roundPercentage = (percentage) => {
+    return Math.round((percentage + Number.EPSILON) * 100) / 100;
+};
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!exports.isSendingMeasuresEnable()) {
+    if (!isSendingMeasuresEnable()) {
         return undefined;
     }
     const mainBranchName = utils_1.getInputValue('measures-server-main-branch');
@@ -128,15 +130,12 @@ const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, fun
 });
 exports.setMainCoverageValue = setMainCoverageValue;
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
-    if (!exports.isSendingMeasuresEnable()) {
+    if (!isSendingMeasuresEnable()) {
         return undefined;
     }
     return yield getMeasures(utils_1.getInputValue('measures-server-repository'));
 });
 exports.getMainCoverageValue = getMainCoverageValue;
-const roundPercentage = (percentage) => {
-    return Math.round((percentage + Number.EPSILON) * 100) / 100;
-};
 const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(void 0, void 0, void 0, function* () {
     let difference;
     let icon = ':green_circle:';
