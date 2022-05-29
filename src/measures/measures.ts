@@ -41,9 +41,8 @@ export const sendMeasures = async (repository: string, coveragePercentage: numbe
     return;
   }
   const url: string = getInputValue('measures-server-host');
-  const origin = getOrigin();
 
-  await sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, origin);
+  await sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, getOrigin());
 };
 
 export const getMeasures = async (repository: string): Promise<Measure> => {
@@ -52,7 +51,7 @@ export const getMeasures = async (repository: string): Promise<Measure> => {
   }
   const url: string = getInputValue('measures-server-host') + `?repository=${repository}`;
 
-  const response = await sendRequest('GET', url, getAuthHeader(), origin);
+  const response = await sendRequest('GET', url, getAuthHeader(), undefined, getOrigin());
   const measure: Measure = response as any as Measure;
 
   return measure;

@@ -95,8 +95,7 @@ const sendMeasures = (repository, coveragePercentage) => __awaiter(void 0, void 
         return;
     }
     const url = utils_1.getInputValue('measures-server-host');
-    const origin = getOrigin();
-    yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, origin);
+    yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, getOrigin());
 });
 exports.sendMeasures = sendMeasures;
 const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
@@ -104,7 +103,7 @@ const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* 
         return {};
     }
     const url = utils_1.getInputValue('measures-server-host') + `?repository=${repository}`;
-    const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader(), origin);
+    const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader(), undefined, getOrigin());
     const measure = response;
     return measure;
 });
