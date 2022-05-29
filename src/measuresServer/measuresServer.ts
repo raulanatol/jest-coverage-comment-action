@@ -3,7 +3,7 @@ import { HederFieldValue, sendRequest } from '../networkUtils';
 import { execCommand, getInputValue } from '../utils';
 import { Measure } from './measuresServer.type';
 
-export const isSendingMeasuresEnable = (): boolean => {
+const isSendingMeasuresEnable = (): boolean => {
   const url: string = getInputValue('measures-server-host');
   const enabled = Boolean(url);
 
@@ -50,6 +50,10 @@ const getMeasures = async (repository: string): Promise<Measure | undefined> => 
   return measure;
 };
 
+const roundPercentage = (percentage: number): number => {
+  return Math.round((percentage + Number.EPSILON) * 100) / 100;
+};
+
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   if (!isSendingMeasuresEnable()) {
     return undefined;
@@ -80,10 +84,6 @@ export const getMainCoverageValue = async (): Promise<Measure | undefined> => {
     return undefined;
   }
   return await getMeasures(getInputValue('measures-server-repository'));
-};
-
-const roundPercentage = (percentage: number): number => {
-  return Math.round((percentage + Number.EPSILON) * 100) / 100;
 };
 
 export const generateCompareComment = async (percent: number, mainPercentage: number, summary: string): Promise<string> => {
