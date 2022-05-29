@@ -84,7 +84,7 @@ const getAuthHeader = () => {
     return undefined;
 };
 const getOrigin = () => {
-    const origin = utils_1.getInputValue('measures-server-origin');
+    const origin = utils_1.getInputValue('measures-server-cors-origin');
     if (origin) {
         return origin;
     }

@@ -26,7 +26,7 @@ const getAuthHeader = (): HederFieldValue | undefined => {
 };
 
 const getOrigin = (): string | undefined => {
-  const origin = getInputValue('measures-server-origin');
+  const origin = getInputValue('measures-server-cors-origin');
 
   if (origin) {
     return origin;
