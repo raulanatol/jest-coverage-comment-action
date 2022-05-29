@@ -4,8 +4,7 @@ import { info, error, getInput, warning, InputOptions } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
-import { Measure } from './measures/measures.type';
-import { getMeasures, isSendingMeasuresEnable, sendMeasures } from './measures/measures';
+import { generateCompareComment, getMainCoverageValue, setMainCoverageValue } from './measures/measures';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -58,10 +57,6 @@ export const getCoveragePercent = async (): Promise<number> => {
   return formattedPercent;
 };
 
-const roundPercentage = (percentage: number): number => {
-  return Math.round((percentage + Number.EPSILON) * 100) / 100;
-};
-
 export const generateComment = async (percent: number, summary: string): Promise<string> => {
   const mainMeasure = await getMainCoverageValue();
   if (mainMeasure) {
@@ -69,26 +64,6 @@ export const generateComment = async (percent: number, summary: string): Promise
   }
 
   return `<p>Total Coverage: <code>${percent}</p>
-<details><summary>Coverage report</summary>
-
-${summary}
-
-</details>`;
-};
-
-export const generateCompareComment = async (percent: number, mainPercentage: number, summary: string): Promise<string> => {
-  let difference: string;
-  let icon = ':green_circle:';
-  if (percent > mainPercentage) {
-    difference = `+ ${roundPercentage(percent - mainPercentage)}`;
-  } else if (percent < mainPercentage) {
-    difference = `<strong>- ${roundPercentage(percent - mainPercentage)}</strong>`;
-    icon = ':yellow_circle:';
-  } else {
-    difference = ' 0.00';
-  }
-
-  return `<p>${icon} Total Coverage: <code>${percent} %</code> (<code>${difference}</code>) vs main: <code>${mainPercentage} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -209,36 +184,4 @@ export const generateJestCommand = () => {
   const baseCommand = getInput('jest-command');
   const changeSinceParam = generateChangeSinceParam(baseCommand);
   return `${baseCommand} ${changeSinceParam}`;
-};
-
-export const getMainCoverageValue = async (): Promise<Measure | undefined> => {
-  if (!isSendingMeasuresEnable()) {
-    return undefined;
-  }
-  return await getMeasures(getInputValue('measures-server-repository'));
-};
-
-export const setMainCoverageValue = async (coverage: number): Promise<void> => {
-  if (!isSendingMeasuresEnable()) {
-    return undefined;
-  }
-  const mainBranchName = getInputValue('measures-server-main-branch');
-  try {
-    const branch = await execCommand('printenv GITHUB_HEAD_REF');
-    info(`Main branch [${mainBranchName}] current branch [${branch}]`);
-    if (branch !== mainBranchName) {
-      info(`Measure does NOT need to be send as we are NOT in Main branch [${mainBranchName}]`);
-      return;
-    }
-  } catch (errorMsg) {
-    error(`Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
-  }
-
-  const repository = getInputValue('measures-server-repository');
-  info(`Measure needs to be send for ${repository} as we are in Main branch [${mainBranchName}]`);
-  try {
-    await sendMeasures(repository, coverage);
-  } catch (errorMsg) {
-    error(`Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
-  }
 };

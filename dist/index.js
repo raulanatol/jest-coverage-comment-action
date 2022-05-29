@@ -63,7 +63,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMeasures = exports.sendMeasures = exports.isSendingMeasuresEnable = void 0;
+exports.generateCompareComment = exports.getMainCoverageValue = exports.setMainCoverageValue = exports.isSendingMeasuresEnable = void 0;
 const core_1 = __nccwpck_require__(2186);
 const networkUtils_1 = __nccwpck_require__(3405);
 const utils_1 = __nccwpck_require__(918);
@@ -95,14 +95,69 @@ const sendMeasures = (repository, coveragePercentage) => __awaiter(void 0, void 
     const url = utils_1.getInputValue('measures-server-host');
     yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, getOrigin());
 });
-exports.sendMeasures = sendMeasures;
 const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
     const url = utils_1.getInputValue('measures-server-host') + `?repository=${repository}`;
     const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader(), undefined, getOrigin());
     const measure = response;
     return measure;
 });
-exports.getMeasures = getMeasures;
+const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!exports.isSendingMeasuresEnable()) {
+        return undefined;
+    }
+    const mainBranchName = utils_1.getInputValue('measures-server-main-branch');
+    try {
+        const branch = yield utils_1.execCommand('printenv GITHUB_HEAD_REF');
+        core_1.info(`Main branch [${mainBranchName}] current branch [${branch}]`);
+        if (branch !== mainBranchName) {
+            core_1.info(`Measure does NOT need to be send as we are NOT in Main branch [${mainBranchName}]`);
+            return;
+        }
+    }
+    catch (errorMsg) {
+        core_1.error(`Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
+    }
+    const repository = utils_1.getInputValue('measures-server-repository');
+    core_1.info(`Measure needs to be send for ${repository} as we are in Main branch [${mainBranchName}]`);
+    try {
+        yield sendMeasures(repository, coverage);
+    }
+    catch (errorMsg) {
+        core_1.error(`Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
+    }
+});
+exports.setMainCoverageValue = setMainCoverageValue;
+const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
+    if (!exports.isSendingMeasuresEnable()) {
+        return undefined;
+    }
+    return yield getMeasures(utils_1.getInputValue('measures-server-repository'));
+});
+exports.getMainCoverageValue = getMainCoverageValue;
+const roundPercentage = (percentage) => {
+    return Math.round((percentage + Number.EPSILON) * 100) / 100;
+};
+const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(void 0, void 0, void 0, function* () {
+    let difference;
+    let icon = ':green_circle:';
+    if (percent > mainPercentage) {
+        difference = `+ ${roundPercentage(percent - mainPercentage)}`;
+    }
+    else if (percent < mainPercentage) {
+        difference = `<strong>- ${roundPercentage(percent - mainPercentage)}</strong>`;
+        icon = ':yellow_circle:';
+    }
+    else {
+        difference = ' 0.00';
+    }
+    return `<p>${icon} Total Coverage: <code>${percent} %</code> (<code>${difference}</code>) vs main: <code>${mainPercentage} %</code></p>
+<details><summary>Coverage report</summary>
+
+${summary}
+
+</details>`;
+});
+exports.generateCompareComment = generateCompareComment;
 
 
 /***/ }),
@@ -209,7 +264,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.setMainCoverageValue = exports.getMainCoverageValue = exports.generateJestCommand = exports.getInputValue = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateCompareComment = exports.generateComment = exports.getCoveragePercent = exports.existsCoverageReport = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
+exports.generateJestCommand = exports.getInputValue = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.existsCoverageReport = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
@@ -254,17 +309,14 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
     }
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
     const formattedPercent = Number(parseFloat(percent).toFixed(2));
-    yield exports.setMainCoverageValue(formattedPercent);
+    yield measures_1.setMainCoverageValue(formattedPercent);
     return formattedPercent;
 });
 exports.getCoveragePercent = getCoveragePercent;
-const roundPercentage = (percentage) => {
-    return Math.round((percentage + Number.EPSILON) * 100) / 100;
-};
 const generateComment = (percent, summary) => __awaiter(void 0, void 0, void 0, function* () {
-    const mainMeasure = yield exports.getMainCoverageValue();
+    const mainMeasure = yield measures_1.getMainCoverageValue();
     if (mainMeasure) {
-        return exports.generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
+        return measures_1.generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
     }
     return `<p>Total Coverage: <code>${percent}</p>
 <details><summary>Coverage report</summary>
@@ -274,27 +326,6 @@ ${summary}
 </details>`;
 });
 exports.generateComment = generateComment;
-const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(void 0, void 0, void 0, function* () {
-    let difference;
-    let icon = ':green_circle:';
-    if (percent > mainPercentage) {
-        difference = `+ ${roundPercentage(percent - mainPercentage)}`;
-    }
-    else if (percent < mainPercentage) {
-        difference = `<strong>- ${roundPercentage(percent - mainPercentage)}</strong>`;
-        icon = ':yellow_circle:';
-    }
-    else {
-        difference = ' 0.00';
-    }
-    return `<p>${icon} Total Coverage: <code>${percent} %</code> (<code>${difference}</code>) vs main: <code>${mainPercentage} %</code></p>
-<details><summary>Coverage report</summary>
-
-${summary}
-
-</details>`;
-});
-exports.generateCompareComment = generateCompareComment;
 const isPreviousTotalCoverageComment = comment => (comment.user &&
     comment.body &&
     comment.user.login === 'github-actions[bot]' &&
@@ -389,39 +420,6 @@ const generateJestCommand = () => {
     return `${baseCommand} ${changeSinceParam}`;
 };
 exports.generateJestCommand = generateJestCommand;
-const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
-    if (!measures_1.isSendingMeasuresEnable()) {
-        return undefined;
-    }
-    return yield measures_1.getMeasures(exports.getInputValue('measures-server-repository'));
-});
-exports.getMainCoverageValue = getMainCoverageValue;
-const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!measures_1.isSendingMeasuresEnable()) {
-        return undefined;
-    }
-    const mainBranchName = exports.getInputValue('measures-server-main-branch');
-    try {
-        const branch = yield exports.execCommand('printenv GITHUB_HEAD_REF');
-        core_1.info(`Main branch [${mainBranchName}] current branch [${branch}]`);
-        if (branch !== mainBranchName) {
-            core_1.info(`Measure does NOT need to be send as we are NOT in Main branch [${mainBranchName}]`);
-            return;
-        }
-    }
-    catch (errorMsg) {
-        core_1.error(`Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
-    }
-    const repository = exports.getInputValue('measures-server-repository');
-    core_1.info(`Measure needs to be send for ${repository} as we are in Main branch [${mainBranchName}]`);
-    try {
-        yield measures_1.sendMeasures(repository, coverage);
-    }
-    catch (errorMsg) {
-        core_1.error(`Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
-    }
-});
-exports.setMainCoverageValue = setMainCoverageValue;
 
 
 /***/ }),
