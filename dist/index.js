@@ -63,7 +63,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMeasures = exports.sendMeasures = void 0;
+exports.getMeasures = exports.sendMeasures = exports.isSendingMeasuresEnable = void 0;
 const core_1 = __nccwpck_require__(2186);
 const networkUtils_1 = __nccwpck_require__(3405);
 const utils_1 = __nccwpck_require__(918);
@@ -75,6 +75,7 @@ const isSendingMeasuresEnable = () => {
     }
     return enabled;
 };
+exports.isSendingMeasuresEnable = isSendingMeasuresEnable;
 const getAuthHeader = () => {
     const field = utils_1.getInputValue('measures-server-auth-header-parameter');
     const value = utils_1.getInputValue('measures-server-auth-token');
@@ -91,17 +92,11 @@ const getOrigin = () => {
     return undefined;
 };
 const sendMeasures = (repository, coveragePercentage) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!isSendingMeasuresEnable()) {
-        return;
-    }
     const url = utils_1.getInputValue('measures-server-host');
     yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, getOrigin());
 });
 exports.sendMeasures = sendMeasures;
 const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!isSendingMeasuresEnable()) {
-        return undefined;
-    }
     const url = utils_1.getInputValue('measures-server-host') + `?repository=${repository}`;
     const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader(), undefined, getOrigin());
     const measure = response;
@@ -395,10 +390,16 @@ const generateJestCommand = () => {
 };
 exports.generateJestCommand = generateJestCommand;
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
+    if (!measures_1.isSendingMeasuresEnable()) {
+        return undefined;
+    }
     return yield measures_1.getMeasures(exports.getInputValue('measures-server-repository'));
 });
 exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!measures_1.isSendingMeasuresEnable()) {
+        return undefined;
+    }
     const mainBranchName = exports.getInputValue('measures-server-main-branch');
     try {
         const branch = yield exports.execCommand('printenv GITHUB_HEAD_REF');

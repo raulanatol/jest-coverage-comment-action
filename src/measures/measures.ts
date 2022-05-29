@@ -3,7 +3,7 @@ import { HederFieldValue, sendRequest } from '../networkUtils';
 import { getInputValue } from '../utils';
 import { Measure } from './measures.type';
 
-const isSendingMeasuresEnable = (): boolean => {
+export const isSendingMeasuresEnable = (): boolean => {
   const url: string = getInputValue('measures-server-host');
   const enabled = Boolean(url);
 
@@ -36,18 +36,12 @@ const getOrigin = (): string | undefined => {
 };
 
 export const sendMeasures = async (repository: string, coveragePercentage: number): Promise<void> => {
-  if (!isSendingMeasuresEnable()) {
-    return;
-  }
   const url: string = getInputValue('measures-server-host');
 
   await sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, getOrigin());
 };
 
 export const getMeasures = async (repository: string): Promise<Measure | undefined> => {
-  if (!isSendingMeasuresEnable()) {
-    return undefined;
-  }
   const url: string = getInputValue('measures-server-host') + `?repository=${repository}`;
 
   const response = await sendRequest('GET', url, getAuthHeader(), undefined, getOrigin());

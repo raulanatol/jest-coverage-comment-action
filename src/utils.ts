@@ -5,7 +5,7 @@ import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
 import { Measure } from './measures/measures.type';
-import { getMeasures, sendMeasures } from './measures/measures';
+import { getMeasures, isSendingMeasuresEnable, sendMeasures } from './measures/measures';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -212,10 +212,16 @@ export const generateJestCommand = () => {
 };
 
 export const getMainCoverageValue = async (): Promise<Measure | undefined> => {
+  if (!isSendingMeasuresEnable()) {
+    return undefined;
+  }
   return await getMeasures(getInputValue('measures-server-repository'));
 };
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
+  if (!isSendingMeasuresEnable()) {
+    return undefined;
+  }
   const mainBranchName = getInputValue('measures-server-main-branch');
   try {
     const branch = await execCommand('printenv GITHUB_HEAD_REF');
