@@ -4,7 +4,7 @@ import { info, error, getInput, warning, InputOptions } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
-import { generateCompareComment, getMainCoverageValue, setMainCoverageValue } from './measures/measures';
+import { generateCompareComment, getMainCoverageValue, setMainCoverageValue } from './measuresServer/measuresServer';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;

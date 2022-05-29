@@ -1,7 +1,7 @@
 import { error, info } from '@actions/core';
 import { HederFieldValue, sendRequest } from '../networkUtils';
 import { execCommand, getInputValue } from '../utils';
-import { Measure } from './measures.type';
+import { Measure } from './measuresServer.type';
 
 export const isSendingMeasuresEnable = (): boolean => {
   const url: string = getInputValue('measures-server-host');

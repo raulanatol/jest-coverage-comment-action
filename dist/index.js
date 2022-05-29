@@ -48,7 +48,7 @@ exports.getRestClient = getRestClient;
 
 /***/ }),
 
-/***/ 1373:
+/***/ 4089:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -270,7 +270,7 @@ const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
 const gitHubAPI_1 = __nccwpck_require__(7675);
 const fs = __importStar(__nccwpck_require__(5747));
-const measures_1 = __nccwpck_require__(1373);
+const measuresServer_1 = __nccwpck_require__(4089);
 const findTableStart = (search, array) => {
     const index = array.findIndex((line) => line.startsWith(search), search);
     return (index > 0 ? index : 1);
@@ -309,14 +309,14 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
     }
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
     const formattedPercent = Number(parseFloat(percent).toFixed(2));
-    yield measures_1.setMainCoverageValue(formattedPercent);
+    yield measuresServer_1.setMainCoverageValue(formattedPercent);
     return formattedPercent;
 });
 exports.getCoveragePercent = getCoveragePercent;
 const generateComment = (percent, summary) => __awaiter(void 0, void 0, void 0, function* () {
-    const mainMeasure = yield measures_1.getMainCoverageValue();
+    const mainMeasure = yield measuresServer_1.getMainCoverageValue();
     if (mainMeasure) {
-        return measures_1.generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
+        return measuresServer_1.generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
     }
     return `<p>Total Coverage: <code>${percent}</p>
 <details><summary>Coverage report</summary>
