@@ -35,7 +35,6 @@ const getOrigin = (): string | undefined => {
   return undefined;
 };
 
-
 export const sendMeasures = async (repository: string, coveragePercentage: number): Promise<void> => {
   if (!isSendingMeasuresEnable()) {
     return;
@@ -45,9 +44,9 @@ export const sendMeasures = async (repository: string, coveragePercentage: numbe
   await sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, getOrigin());
 };
 
-export const getMeasures = async (repository: string): Promise<Measure> => {
+export const getMeasures = async (repository: string): Promise<Measure | undefined> => {
   if (!isSendingMeasuresEnable()) {
-    return {} as any as Measure;
+    return undefined;
   }
   const url: string = getInputValue('measures-server-host') + `?repository=${repository}`;
 

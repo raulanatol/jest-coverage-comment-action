@@ -100,7 +100,7 @@ const sendMeasures = (repository, coveragePercentage) => __awaiter(void 0, void 
 exports.sendMeasures = sendMeasures;
 const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isSendingMeasuresEnable()) {
-        return {};
+        return undefined;
     }
     const url = utils_1.getInputValue('measures-server-host') + `?repository=${repository}`;
     const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader(), undefined, getOrigin());

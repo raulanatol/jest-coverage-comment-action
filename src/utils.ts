@@ -211,7 +211,7 @@ export const generateJestCommand = () => {
   return `${baseCommand} ${changeSinceParam}`;
 };
 
-export const getMainCoverageValue = async (): Promise<Measure> => {
+export const getMainCoverageValue = async (): Promise<Measure | undefined> => {
   return await getMeasures(getInputValue('measures-server-repository'));
 };
 
