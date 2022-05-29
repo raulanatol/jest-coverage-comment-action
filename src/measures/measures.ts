@@ -25,14 +25,25 @@ const getAuthHeader = (): HederFieldValue | undefined => {
   return undefined;
 };
 
+const getOrigin = (): string | undefined => {
+  const origin = getInputValue('measures-server-origin');
+
+  if (origin) {
+    return origin;
+  }
+
+  return undefined;
+};
+
 
 export const sendMeasures = async (repository: string, coveragePercentage: number): Promise<void> => {
   if (!isSendingMeasuresEnable()) {
     return;
   }
   const url: string = getInputValue('measures-server-host');
+  const origin = getOrigin();
 
-  await sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage });
+  await sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, origin);
 };
 
 export const getMeasures = async (repository: string): Promise<Measure> => {
@@ -41,7 +52,7 @@ export const getMeasures = async (repository: string): Promise<Measure> => {
   }
   const url: string = getInputValue('measures-server-host') + `?repository=${repository}`;
 
-  const response = await sendRequest('GET', url, getAuthHeader());
+  const response = await sendRequest('GET', url, getAuthHeader(), origin);
   const measure: Measure = response as any as Measure;
 
   return measure;
