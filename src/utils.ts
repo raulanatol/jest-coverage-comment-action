@@ -212,26 +212,27 @@ export const generateJestCommand = () => {
 };
 
 export const getMainCoverageValue = async (): Promise<Measure> => {
-  info(' [action] getMainCoverageValue');
-  return await getMeasures(getInputValue('repository'));
+  return await getMeasures(getInputValue('measures-server-repository'));
 };
 
 export const setMainCoverageValue = async (coverage: number): Promise<void> => {
-  info(' [action] setMainCoverageValue');
-
+  const mainBranchName = getInputValue('measures-server-main-branch');
   try {
     const branch = await execCommand('printenv GITHUB_HEAD_REF');
-    info(` [action] Current branch is ${branch}`);
-    if (branch !== 'main') {
+    info(`Main branch [${mainBranchName}] current branch [${branch}]`);
+    if (branch !== mainBranchName) {
+      info(`Measure does NOT need to be send as we are NOT in Main branch [${mainBranchName}]`);
       return;
     }
   } catch (errorMsg) {
-    error(` [action] Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
+    error(`Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
   }
 
+  const repository = getInputValue('measures-server-repository');
+  info(`Measure needs to be send for ${repository} as we are in Main branch [${mainBranchName}]`);
   try {
-    await sendMeasures(getInputValue('repository'), coverage);
+    await sendMeasures(repository, coverage);
   } catch (errorMsg) {
-    error(` [action] Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
+    error(`Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
   }
 };

@@ -68,12 +68,16 @@ const core_1 = __nccwpck_require__(2186);
 const networkUtils_1 = __nccwpck_require__(3405);
 const utils_1 = __nccwpck_require__(918);
 const isSendingMeasuresEnable = () => {
-    const url = utils_1.getInputValue('host-measures');
-    return Boolean(url);
+    const url = utils_1.getInputValue('measures-server-host');
+    const enabled = Boolean(url);
+    if (!enabled) {
+        core_1.info('Sending measures to server is disable as NO host is recognized');
+    }
+    return enabled;
 };
 const getAuthHeader = () => {
-    const field = utils_1.getInputValue('auth-header-parameter');
-    const value = utils_1.getInputValue('auth-token');
+    const field = utils_1.getInputValue('measures-server-auth-header-parameter');
+    const value = utils_1.getInputValue('measures-server-auth-token');
     if (field && value) {
         return { field, value };
     }
@@ -81,23 +85,18 @@ const getAuthHeader = () => {
 };
 const sendMeasures = (repository, coveragePercentage) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isSendingMeasuresEnable()) {
-        core_1.info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
         return;
     }
-    const url = utils_1.getInputValue('host-measures');
-    core_1.info(` [action] sendMeasures - repository: ${repository} coverage percentage: ${coveragePercentage}`);
+    const url = utils_1.getInputValue('measures-server-host');
     yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage });
 });
 exports.sendMeasures = sendMeasures;
 const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isSendingMeasuresEnable()) {
-        core_1.info(' [action] sendMeasures - sending measures to server is disable as no host is recognized');
         return {};
     }
-    const url = utils_1.getInputValue('host-measures') + `?repository=${repository}`;
-    core_1.info(` [action] getMeasures - GET to url: ${url} for repository: ${repository}`);
+    const url = utils_1.getInputValue('measures-server-host') + `?repository=${repository}`;
     const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader());
-    core_1.info(` [action] getMeasures - Data: ${JSON.stringify(response)}`);
     const measure = response;
     return measure;
 });
@@ -124,45 +123,50 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sendRequest = exports.MethodTypeValues = void 0;
 const core_1 = __nccwpck_require__(2186);
 const http_client_1 = __nccwpck_require__(9925);
-const createHeaders = (headeAuthFieldValue) => {
+const createHeaders = (headeAuthFieldValue, origin) => {
     const headers = {
         'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'origin': 'http://localhost:3000'
+        'Content-Type': 'application/json'
     };
+    if (origin) {
+        headers['origin'] = origin;
+    }
     if (headeAuthFieldValue) {
         headers[headeAuthFieldValue.field] = headeAuthFieldValue.value;
     }
     return headers;
 };
 exports.MethodTypeValues = ['GET', 'POST'];
-const sendRequest = (methodType, url, auth, body) => __awaiter(void 0, void 0, void 0, function* () {
+const sendRequest = (methodType, url, auth, body, origin) => __awaiter(void 0, void 0, void 0, function* () {
     const httpClient = new http_client_1.HttpClient('jest-coverage-action');
-    core_1.info(` [action] sendRequest - Operation: ${methodType}  Url: ${url} Body:\n ${JSON.stringify(body)}`);
+    core_1.info(`Network request via: ${methodType} Origin: ${origin} Url: ${url} Body: ${JSON.stringify(body)}`);
     let response;
     if (methodType === 'GET') {
-        response = yield httpClient.get(url, createHeaders(auth));
+        response = yield httpClient.get(url, createHeaders(auth, origin));
     }
     else {
-        response = yield httpClient.post(url, JSON.stringify(body), createHeaders(auth));
+        response = yield httpClient.post(url, JSON.stringify(body), createHeaders(auth, origin));
     }
     const statusCode = response.message.statusCode;
     if (!statusCode) {
-        const message = ' [action] sendRequest - Response not received';
+        const message = 'NO response received';
         core_1.error(message);
         throw new Error(message);
     }
-    core_1.info(` [action] sendRequest - Response ${statusCode}`);
+    core_1.info(`Network response: ${statusCode}`);
     if (statusCode < 200 || statusCode >= 300) {
-        const message = ` [action] sendRequest - Not expected response ${statusCode}`;
+        const message = `Unexpected response ${statusCode}. Expected status code 2XX`;
         core_1.error(message);
         throw new Error(message);
     }
     if (statusCode === 204) {
+        core_1.info('Network response: 204 - No Content');
         return;
     }
     const rawBodyResponse = yield response.readBody();
-    return JSON.parse(rawBodyResponse);
+    const bodyResponse = JSON.parse(rawBodyResponse);
+    core_1.info(`Network response body: ${bodyResponse}`);
+    return bodyResponse;
 });
 exports.sendRequest = sendRequest;
 
@@ -384,27 +388,29 @@ const generateJestCommand = () => {
 };
 exports.generateJestCommand = generateJestCommand;
 const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
-    core_1.info(' [action] getMainCoverageValue');
-    return yield measures_1.getMeasures(exports.getInputValue('repository'));
+    return yield measures_1.getMeasures(exports.getInputValue('measures-server-repository'));
 });
 exports.getMainCoverageValue = getMainCoverageValue;
 const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
-    core_1.info(' [action] setMainCoverageValue');
+    const mainBranchName = exports.getInputValue('measures-server-main-branch');
     try {
         const branch = yield exports.execCommand('printenv GITHUB_HEAD_REF');
-        core_1.info(` [action] Current branch is ${branch}`);
-        if (branch !== 'main') {
+        core_1.info(`Main branch [${mainBranchName}] current branch [${branch}]`);
+        if (branch !== mainBranchName) {
+            core_1.info(`Measure does NOT need to be send as we are NOT in Main branch [${mainBranchName}]`);
             return;
         }
     }
     catch (errorMsg) {
-        core_1.error(` [action] Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
+        core_1.error(`Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
     }
+    const repository = exports.getInputValue('measures-server-repository');
+    core_1.info(`Measure needs to be send for ${repository} as we are in Main branch [${mainBranchName}]`);
     try {
-        yield measures_1.sendMeasures(exports.getInputValue('repository'), coverage);
+        yield measures_1.sendMeasures(repository, coverage);
     }
     catch (errorMsg) {
-        core_1.error(` [action] Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
+        core_1.error(`Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
     }
 });
 exports.setMainCoverageValue = setMainCoverageValue;
