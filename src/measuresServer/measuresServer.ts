@@ -67,7 +67,9 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
       return;
     }
   } catch (errorMsg) {
-    error(`Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
+    const message = `Could not retireve current branch:\n${JSON.stringify(errorMsg)}`;
+    error(message);
+    throw Error(message);
   }
 
   const repository = getInputValue('measures-server-repository');
@@ -75,7 +77,9 @@ export const setMainCoverageValue = async (coverage: number): Promise<void> => {
   try {
     await sendMeasures(repository, coverage);
   } catch (errorMsg) {
-    error(`Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
+    const message = `Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`;
+    error(message);
+    throw Error(message);
   }
 };
 
@@ -86,7 +90,7 @@ export const getMainCoverageValue = async (): Promise<Measure | undefined> => {
   return await getMeasures(getInputValue('measures-server-repository'));
 };
 
-export const generateCompareComment = async (percent: number, mainPercentage: number, summary: string): Promise<string> => {
+export const generateCompareComment = (percent: number, mainPercentage: number, summary: string): string => {
   let difference: string;
   let icon = ':green_circle:';
   if (percent > mainPercentage) {
