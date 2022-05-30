@@ -20,9 +20,14 @@ jest.mock('@actions/core', () => ({
         return 'npx jest --coverage';
       case 'only-changes':
         return 'true';
+      case 'measures-server-host' :
+        return '';
     }
   },
   warning: () => {
+    return jest.fn();
+  },
+  info: () => {
     return jest.fn();
   }
 }));
@@ -100,13 +105,13 @@ describe('utils', () => {
   });
 
   describe('generateComment', () => {
-    test.skip('should return a valid comment', async () => {
+    test('should return a valid comment', async () => {
       const realSummary = summaryFormatter(validJestReportResponse);
 
       const result = await generateComment(30, realSummary);
 
       const expected = [
-        '<p>Total Coverage: <code>30 %</code> vs main: <code>-1 %</code></p>',
+        '<p>Total Coverage: <code>30 %</code></p>',
         '<details><summary>Coverage report</summary>',
         '',
         'File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s·',
@@ -135,7 +140,7 @@ describe('utils', () => {
       expect(await getCoveragePercent()).toBe(0);
     });
 
-    it.skip('should call to an external command if the ./coverage/lcov.info file exists', async () => {
+    it('should call to an external command if the ./coverage/lcov.info file exists', async () => {
       const fs = require('fs');
       fs.existsSync = jest.fn().mockReturnValue(true);
 

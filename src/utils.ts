@@ -63,7 +63,7 @@ export const generateComment = async (percent: number, summary: string): Promise
     return generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
   }
 
-  return `<p>Total Coverage: <code>${percent}</p>
+  return `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}

@@ -317,7 +317,7 @@ const generateComment = (percent, summary) => __awaiter(void 0, void 0, void 0, 
     if (mainMeasure) {
         return measuresServer_1.generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
     }
-    return `<p>Total Coverage: <code>${percent}</p>
+    return `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
@@ -7678,7 +7678,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const action_1 = __nccwpck_require__(9139);
 action_1.start()
-    .then(() => core_1.info('Finished! V0.1.1.3.4'))
+    .then(() => core_1.info('Finished!'))
     .catch(error => core_1.setFailed(error.message));
 
 })();
