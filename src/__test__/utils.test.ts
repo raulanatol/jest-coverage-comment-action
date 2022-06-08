@@ -20,9 +20,14 @@ jest.mock('@actions/core', () => ({
         return 'npx jest --coverage';
       case 'only-changes':
         return 'true';
+      case 'measures-server-host' :
+        return '';
     }
   },
   warning: () => {
+    return jest.fn();
+  },
+  info: () => {
     return jest.fn();
   }
 }));
@@ -100,10 +105,10 @@ describe('utils', () => {
   });
 
   describe('generateComment', () => {
-    test('should return a valid comment', () => {
+    test('should return a valid comment', async () => {
       const realSummary = summaryFormatter(validJestReportResponse);
 
-      const result = generateComment(30, realSummary);
+      const result = await generateComment(30, realSummary);
 
       const expected = [
         '<p>Total Coverage: <code>30 %</code></p>',

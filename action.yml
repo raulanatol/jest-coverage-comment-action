@@ -28,6 +28,26 @@ inputs:
     description: 'Use existing coverage report fi exists, and do not run the tests'
     required: false
     default: 'false'
+  measures-server-host:
+    description: 'Host + endpoint to retreive (GET) and set (POST) measures. If unset, functionality is disabled. Example: https://49f0-81-61-118-50.eu.ngrok.io/v1/testing/report/measures'
+    required: false
+  measures-server-auth-header-parameter:
+    description: 'Header field for sending the auth-token to identify aginst the measures server'
+    required: false
+    default: 'bearer'
+  measures-server-auth-token:
+    description: 'Key to identify against the measures server'
+    required: false
+  measures-server-cors-origin:
+    description: 'In case of having CORS enabled in measures server'
+    required: false
+  measures-server-repository:
+    description: 'Repository name to identify in the measures server. Example: backend, front, app, ...'
+    required: false
+  measures-server-main-branch:
+    description: 'IIdentifies the branch from whom the measures are sent to the host. This will be the branch against the others will compare.'
+    required: false
+    default: 'main'
 runs:
   using: 'node12'
   main: 'dist/index.js'

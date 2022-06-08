@@ -22,7 +22,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     const jestCommand = utils_1.generateJestCommand();
     const coverageSummary = yield utils_1.generateCoverageSummary(jestCommand);
     const percent = yield utils_1.getCoveragePercent();
-    const comment = utils_1.generateComment(percent, coverageSummary);
+    const comment = yield utils_1.generateComment(percent, coverageSummary);
     yield utils_1.createComment(comment);
 });
 exports.start = start;
@@ -38,12 +38,197 @@ exports.start = start;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRestClient = void 0;
 const github_1 = __nccwpck_require__(5438);
-const core_1 = __nccwpck_require__(2186);
+const utils_1 = __nccwpck_require__(918);
 const getRestClient = () => {
-    const octokit = github_1.getOctokit(core_1.getInput('github-token'));
+    const octokit = github_1.getOctokit(utils_1.getInputValue('github-token'));
     return octokit.rest;
 };
 exports.getRestClient = getRestClient;
+
+
+/***/ }),
+
+/***/ 4089:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.generateCompareComment = exports.getMainCoverageValue = exports.setMainCoverageValue = void 0;
+const core_1 = __nccwpck_require__(2186);
+const networkUtils_1 = __nccwpck_require__(3405);
+const utils_1 = __nccwpck_require__(918);
+const isSendingMeasuresEnable = () => {
+    const url = utils_1.getInputValue('measures-server-host');
+    const enabled = Boolean(url);
+    if (!enabled) {
+        core_1.info('Sending measures to server is disable as NO host is recognized');
+    }
+    return enabled;
+};
+const getAuthHeader = () => {
+    const field = utils_1.getInputValue('measures-server-auth-header-parameter');
+    const value = utils_1.getInputValue('measures-server-auth-token');
+    if (field && value) {
+        return { field, value };
+    }
+    return undefined;
+};
+const getOrigin = () => {
+    const origin = utils_1.getInputValue('measures-server-cors-origin');
+    if (origin) {
+        return origin;
+    }
+    return undefined;
+};
+const sendMeasures = (repository, coveragePercentage) => __awaiter(void 0, void 0, void 0, function* () {
+    const url = utils_1.getInputValue('measures-server-host');
+    yield networkUtils_1.sendRequest('POST', url, getAuthHeader(), { repository, coveragePercentage }, getOrigin());
+});
+const getMeasures = (repository) => __awaiter(void 0, void 0, void 0, function* () {
+    const url = utils_1.getInputValue('measures-server-host') + `?repository=${repository}`;
+    const response = yield networkUtils_1.sendRequest('GET', url, getAuthHeader(), undefined, getOrigin());
+    const measure = response;
+    return measure;
+});
+const roundPercentage = (percentage) => {
+    return Math.round((percentage + Number.EPSILON) * 100) / 100;
+};
+const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!isSendingMeasuresEnable()) {
+        return undefined;
+    }
+    const mainBranchName = utils_1.getInputValue('measures-server-main-branch');
+    try {
+        const branch = yield utils_1.execCommand('printenv GITHUB_HEAD_REF');
+        core_1.info(`Main branch [${mainBranchName}] current branch [${branch}]`);
+        if (branch !== mainBranchName) {
+            core_1.info(`Measure does NOT need to be send as we are NOT in Main branch [${mainBranchName}]`);
+            return;
+        }
+    }
+    catch (errorMsg) {
+        const message = `Could not retireve current branch:\n${JSON.stringify(errorMsg)}`;
+        core_1.error(message);
+        throw Error(message);
+    }
+    const repository = utils_1.getInputValue('measures-server-repository');
+    core_1.info(`Measure needs to be send for ${repository} as we are in Main branch [${mainBranchName}]`);
+    try {
+        yield sendMeasures(repository, coverage);
+    }
+    catch (errorMsg) {
+        const message = `Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`;
+        core_1.error(message);
+        throw Error(message);
+    }
+});
+exports.setMainCoverageValue = setMainCoverageValue;
+const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* () {
+    if (!isSendingMeasuresEnable()) {
+        return undefined;
+    }
+    return yield getMeasures(utils_1.getInputValue('measures-server-repository'));
+});
+exports.getMainCoverageValue = getMainCoverageValue;
+const generateCompareComment = (percent, mainPercentage, summary) => {
+    let difference;
+    let icon = ':green_circle:';
+    if (percent > mainPercentage) {
+        difference = `+ ${roundPercentage(percent - mainPercentage)}`;
+    }
+    else if (percent < mainPercentage) {
+        difference = `<strong>- ${roundPercentage(percent - mainPercentage)}</strong>`;
+        icon = ':yellow_circle:';
+    }
+    else {
+        difference = ' 0.00';
+    }
+    return `<p>${icon} Total Coverage: <code>${percent} %</code> (<code>${difference}</code>) vs main: <code>${mainPercentage} %</code></p>
+<details><summary>Coverage report</summary>
+
+${summary}
+
+</details>`;
+};
+exports.generateCompareComment = generateCompareComment;
+
+
+/***/ }),
+
+/***/ 3405:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sendRequest = exports.MethodTypeValues = void 0;
+const core_1 = __nccwpck_require__(2186);
+const http_client_1 = __nccwpck_require__(9925);
+const createHeaders = (headeAuthFieldValue, origin) => {
+    const headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    };
+    if (origin) {
+        headers['origin'] = origin;
+    }
+    if (headeAuthFieldValue) {
+        headers[headeAuthFieldValue.field] = headeAuthFieldValue.value;
+    }
+    return headers;
+};
+exports.MethodTypeValues = ['GET', 'POST'];
+const sendRequest = (methodType, url, auth, body, origin) => __awaiter(void 0, void 0, void 0, function* () {
+    const httpClient = new http_client_1.HttpClient('jest-coverage-action');
+    core_1.info(`Network request via: ${methodType} Origin: ${origin} Url: ${url} Body: ${JSON.stringify(body)}`);
+    let response;
+    if (methodType === 'GET') {
+        response = yield httpClient.get(url, createHeaders(auth, origin));
+    }
+    else {
+        response = yield httpClient.post(url, JSON.stringify(body), createHeaders(auth, origin));
+    }
+    const statusCode = response.message.statusCode;
+    if (!statusCode) {
+        const message = 'NO response received';
+        core_1.error(message);
+        throw new Error(message);
+    }
+    core_1.info(`Network response: ${statusCode}`);
+    if (statusCode < 200 || statusCode >= 300) {
+        const message = `Unexpected response ${statusCode}. Expected status code 2XX`;
+        core_1.error(message);
+        throw new Error(message);
+    }
+    if (statusCode === 204) {
+        core_1.info('Network response: 204 - No Content');
+        return;
+    }
+    const rawBodyResponse = yield response.readBody();
+    const bodyResponse = JSON.parse(rawBodyResponse);
+    core_1.info(`Network response body: ${bodyResponse}`);
+    return bodyResponse;
+});
+exports.sendRequest = sendRequest;
 
 
 /***/ }),
@@ -82,12 +267,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.generateJestCommand = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.existsCoverageReport = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
+exports.generateJestCommand = exports.getInputValue = exports.generateCoverageSummary = exports.createComment = exports.getIssueNumber = exports.generateComment = exports.getCoveragePercent = exports.existsCoverageReport = exports.execCommand = exports.summaryFormatter = exports.stringFormatter = void 0;
 const exec_1 = __nccwpck_require__(1514);
 const github_1 = __nccwpck_require__(5438);
 const core_1 = __nccwpck_require__(2186);
 const gitHubAPI_1 = __nccwpck_require__(7675);
 const fs = __importStar(__nccwpck_require__(5747));
+const measuresServer_1 = __nccwpck_require__(4089);
 const findTableStart = (search, array) => {
     const index = array.findIndex((line) => line.startsWith(search), search);
     return (index > 0 ? index : 1);
@@ -97,7 +283,7 @@ exports.stringFormatter = stringFormatter;
 const summaryFormatter = (input) => exports.stringFormatter(input.slice(findTableStart('File', input), input.length - 1));
 exports.summaryFormatter = summaryFormatter;
 const execCommand = (command, formatter = exports.stringFormatter) => __awaiter(void 0, void 0, void 0, function* () {
-    const workingDir = core_1.getInput('working-directory');
+    const workingDir = exports.getInputValue('working-directory');
     const output = [];
     const options = {
         silent: true,
@@ -125,15 +311,23 @@ const getCoveragePercent = () => __awaiter(void 0, void 0, void 0, function* () 
         return 0;
     }
     const percent = yield exports.execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
-    return Number(parseFloat(percent).toFixed(2));
+    const formattedPercent = Number(parseFloat(percent).toFixed(2));
+    yield measuresServer_1.setMainCoverageValue(formattedPercent);
+    return formattedPercent;
 });
 exports.getCoveragePercent = getCoveragePercent;
-const generateComment = (percent, summary) => `<p>Total Coverage: <code>${percent} %</code></p>
+const generateComment = (percent, summary) => __awaiter(void 0, void 0, void 0, function* () {
+    const mainMeasure = yield measuresServer_1.getMainCoverageValue();
+    if (mainMeasure) {
+        return measuresServer_1.generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
+    }
+    return `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
 
 </details>`;
+});
 exports.generateComment = generateComment;
 const isPreviousTotalCoverageComment = comment => (comment.user &&
     comment.body &&
@@ -193,8 +387,14 @@ const generateCoverageSummary = (jestCommand) => __awaiter(void 0, void 0, void 
     return yield exports.execCommand(command);
 });
 exports.generateCoverageSummary = generateCoverageSummary;
+const getInputValue = (name, options) => {
+    const value = core_1.getInput(name, options);
+    core_1.info(`Getting parameter ${name} with value ${value}`);
+    return value;
+};
+exports.getInputValue = getInputValue;
 const getBooleanInput = (input) => {
-    switch (core_1.getInput(input)) {
+    switch (exports.getInputValue(input)) {
         case 'true':
             return true;
         case 'false':
