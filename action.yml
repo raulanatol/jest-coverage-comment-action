@@ -45,7 +45,7 @@ inputs:
     description: 'Repository name to identify in the measures server. Example: backend, front, app, ...'
     required: false
   measures-server-main-branch:
-    description: 'IIdentifies the branch from whom the measures are sent to the host. This will be the branch against the others will compare.'
+    description: 'Identifies the branch from whom the measures are sent to the host. This will be the branch against the others will compare.'
     required: false
     default: 'main'
 runs:
