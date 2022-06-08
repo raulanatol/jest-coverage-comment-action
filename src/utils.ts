@@ -1,9 +1,10 @@
 import { exec } from '@actions/exec';
 import { context } from '@actions/github';
-import { error, getInput, warning } from '@actions/core';
+import { info, error, getInput, warning, InputOptions } from '@actions/core';
 import { getRestClient } from './gitHubAPI';
 import * as fs from 'fs';
 import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
+import { generateCompareComment, getMainCoverageValue, setMainCoverageValue } from './measuresServer/measuresServer';
 
 // eslint-disable-next-line no-unused-vars
 type CommandResultFormatter = (input: string[]) => string;
@@ -20,7 +21,7 @@ export const summaryFormatter: CommandResultFormatter = (input: string[]) =>
   stringFormatter(input.slice(findTableStart('File', input), input.length - 1));
 
 export const execCommand = async (command: string, formatter = stringFormatter): Promise<string> => {
-  const workingDir = getInput('working-directory');
+  const workingDir = getInputValue('working-directory');
   const output: string[] = [];
   const options = {
     silent: true,
@@ -51,16 +52,26 @@ export const getCoveragePercent = async (): Promise<number> => {
   }
 
   const percent = await execCommand('npx coverage-percentage ./coverage/lcov.info --lcov');
-  return Number(parseFloat(percent).toFixed(2));
+  const formattedPercent = Number(parseFloat(percent).toFixed(2));
+
+  await setMainCoverageValue(formattedPercent);
+
+  return formattedPercent;
 };
 
-export const generateComment = (percent: number, summary: string): string =>
-  `<p>Total Coverage: <code>${percent} %</code></p>
+export const generateComment = async (percent: number, summary: string): Promise<string> => {
+  const mainMeasure = await getMainCoverageValue();
+  if (mainMeasure) {
+    return generateCompareComment(percent, mainMeasure.coverageMeasure.percentage, summary);
+  }
+
+  return `<p>Total Coverage: <code>${percent} %</code></p>
 <details><summary>Coverage report</summary>
 
 ${summary}
 
 </details>`;
+};
 
 const isPreviousTotalCoverageComment = comment => (
   comment.user &&
@@ -137,8 +148,14 @@ export const generateCoverageSummary = async (jestCommand: string): Promise<stri
   return await execCommand(command);
 };
 
+export const getInputValue = (name: string, options?: InputOptions): string => {
+  const value = getInput(name, options);
+  info(`Getting parameter ${name} with value ${value}`);
+  return value;
+};
+
 const getBooleanInput = (input: string): boolean | undefined => {
-  switch (getInput(input)) {
+  switch (getInputValue(input)) {
     case 'true':
       return true;
     case 'false':
