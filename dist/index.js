@@ -117,7 +117,9 @@ const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, fun
         }
     }
     catch (errorMsg) {
-        core_1.error(`Could not retireve current branch:\n${JSON.stringify(errorMsg)}`);
+        const message = `Could not retireve current branch:\n${JSON.stringify(errorMsg)}`;
+        core_1.error(message);
+        throw Error(message);
     }
     const repository = utils_1.getInputValue('measures-server-repository');
     core_1.info(`Measure needs to be send for ${repository} as we are in Main branch [${mainBranchName}]`);
@@ -125,7 +127,9 @@ const setMainCoverageValue = (coverage) => __awaiter(void 0, void 0, void 0, fun
         yield sendMeasures(repository, coverage);
     }
     catch (errorMsg) {
-        core_1.error(`Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`);
+        const message = `Report measures NOT sent to server:\n${JSON.stringify(errorMsg)}`;
+        core_1.error(message);
+        throw Error(message);
     }
 });
 exports.setMainCoverageValue = setMainCoverageValue;
@@ -136,7 +140,7 @@ const getMainCoverageValue = () => __awaiter(void 0, void 0, void 0, function* (
     return yield getMeasures(utils_1.getInputValue('measures-server-repository'));
 });
 exports.getMainCoverageValue = getMainCoverageValue;
-const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(void 0, void 0, void 0, function* () {
+const generateCompareComment = (percent, mainPercentage, summary) => {
     let difference;
     let icon = ':green_circle:';
     if (percent > mainPercentage) {
@@ -155,7 +159,7 @@ const generateCompareComment = (percent, mainPercentage, summary) => __awaiter(v
 ${summary}
 
 </details>`;
-});
+};
 exports.generateCompareComment = generateCompareComment;
 
 
@@ -7678,7 +7682,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core_1 = __nccwpck_require__(2186);
 const action_1 = __nccwpck_require__(9139);
 action_1.start()
-    .then(() => core_1.info('Finished!'))
+    .then(() => core_1.info('Finished!Main1'))
     .catch(error => core_1.setFailed(error.message));
 
 })();
