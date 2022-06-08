@@ -66,7 +66,7 @@ POST will include in the body: { repository: string, coveragePercentage: number 
 ```yaml
 uses: raulanatol/jest-coverage-comment-action@main
 with:
-  github-token: ${{ secrets.GITHUB_TOKEN }}'
+  github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 # Example using a custom jest command and working directory
